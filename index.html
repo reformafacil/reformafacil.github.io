@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#6d5dfc">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Reforma Fácil">
+<meta name="description" content="Calcule e entenda CBS, IBS e Imposto Seletivo da Reforma Tributária.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icones/favicon-32.png">
+<link rel="apple-touch-icon" href="icones/apple-touch-icon.png">
+<title>Reforma Fácil — CBS, IBS e IS</title>
+<style>
+  :root {
+    --bg: #f0f2f7; --card: #ffffff; --ink: #0f1222; --muted: #6b7088; --line: #e8eaf2; --soft: #f5f6fb;
+    --grad: linear-gradient(135deg, #6d5dfc 0%, #c94bff 50%, #ff6a88 100%);
+    --pri: #6d5dfc; --pri-ink: #ffffff; --ok: #12b76a; --err: #f04438;
+    --cbs: #3b82f6; --ibs: #10b981; --is: #c94bff;
+    --r: 22px; --sombra: 0 1px 2px rgba(16,18,34,.04), 0 8px 24px rgba(16,18,34,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0b0c14; --card: #151724; --ink: #f2f3fa; --muted: #9096b2; --line: #24273a; --soft: #1c1f30;
+      --pri: #8b7dff; --sombra: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35); }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; }
+
+  /* ── estrutura: barra lateral + feed ── */
+  .app { display: grid; grid-template-columns: 260px minmax(0, 720px); justify-content: center; gap: 28px; padding: 0 20px; }
+  .lateral { position: sticky; top: 0; height: 100vh; padding: 26px 0; display: flex; flex-direction: column; gap: 22px; }
+  .logo { display: flex; align-items: center; gap: 12px; padding: 0 10px; }
+  .logo-ico { width: 44px; height: 44px; border-radius: 14px; background: var(--grad); display: grid; place-items: center;
+    color: #fff; font-weight: 800; font-size: 18px; box-shadow: 0 6px 18px rgba(201,75,255,.35); }
+  .logo b { display: block; font-size: 17px; letter-spacing: -.01em; }
+  .logo small { color: var(--muted); font-size: 12.5px; }
+  nav#abas { display: flex; flex-direction: column; gap: 4px; }
+  nav#abas button { display: flex; align-items: center; gap: 14px; background: transparent; color: var(--ink); border: 0;
+    padding: 12px 14px; font: inherit; font-size: 15.5px; font-weight: 500; border-radius: 16px; cursor: pointer; text-align: left;
+    transition: background .15s; }
+  nav#abas button svg { width: 24px; height: 24px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+  nav#abas button:hover { background: var(--card); }
+  nav#abas button.on { background: var(--card); font-weight: 700; box-shadow: var(--sombra); }
+  nav#abas button.on svg { stroke: var(--pri); stroke-width: 2.3; }
+  .lateral-card { margin-top: auto; background: var(--card); border-radius: var(--r); padding: 16px; box-shadow: var(--sombra); font-size: 13px; color: var(--muted); }
+  .lateral-card b { color: var(--ink); }
+  main { padding: 26px 0 60px; min-width: 0; }
+  .topo-movel { display: none; }
+
+  .aba { display: none; animation: surgir .25s ease; } .aba.on { display: block; }
+  @keyframes surgir { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* ── cards (posts) ── */
+  .card { background: var(--card); border-radius: var(--r); padding: 20px 22px; margin-bottom: 16px; box-shadow: var(--sombra); border: 0; }
+  .card h2 { margin: 0 0 14px; font-size: 18px; letter-spacing: -.01em; }
+  .card h3 { margin: 18px 0 8px; font-size: 15px; }
+  .post-cab { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .post-cab .av { width: 42px; height: 42px; border-radius: 50%; background: var(--grad); color: #fff; display: grid; place-items: center; font-weight: 800; flex: none; }
+  .post-cab b { display: block; font-size: 15.5px; } .post-cab small { color: var(--muted); font-size: 13px; }
+  .titulo-feed { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin: 22px 6px 10px; }
+
+  .grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+  label { display: block; font-size: 12.5px; color: var(--muted); margin: 0 0 6px 4px; font-weight: 600; }
+  input, select { width: 100%; padding: 11px 14px; border: 1.5px solid transparent; border-radius: 14px; font: inherit;
+    background: var(--soft); color: var(--ink); transition: border-color .15s, background .15s; -webkit-appearance: none; appearance: none; }
+  select { background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+    background-position: calc(100% - 18px) 52%, calc(100% - 13px) 52%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 34px; }
+  input:focus, select:focus { outline: none; border-color: var(--pri); background-color: var(--card); }
+  input::placeholder { color: var(--muted); opacity: .8; }
+  input[type=checkbox] { -webkit-appearance: none; appearance: none; width: 42px; height: 24px; padding: 0; border-radius: 99px; background: var(--line);
+    position: relative; cursor: pointer; flex: none; margin: 0 10px 0 0; border: 0; transition: background .2s; }
+  input[type=checkbox]::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s; }
+  input[type=checkbox]:checked { background: var(--grad); }
+  input[type=checkbox]:checked::after { transform: translateX(18px); }
+  .chk { display: flex; align-items: center; font-size: 14.5px; color: var(--ink); font-weight: 500; cursor: pointer; margin: 0; }
+
+  .btn { background: var(--grad); color: #fff; border: 0; padding: 11px 20px; border-radius: 99px; font: inherit; font-weight: 700; cursor: pointer;
+    box-shadow: 0 6px 16px rgba(109,93,252,.28); transition: transform .1s, filter .15s; }
+  .btn:hover { filter: brightness(1.06); } .btn:active { transform: scale(.97); }
+  .btn.sec { background: var(--card); color: var(--ink); box-shadow: var(--sombra); }
+  .btn.peq { padding: 7px 14px; font-size: 13px; box-shadow: none; background: var(--soft); color: var(--ink); }
+  .btn.del { background: transparent; color: var(--muted); box-shadow: none; padding: 6px 12px; font-weight: 600; }
+  .btn.del:hover { color: var(--err); background: var(--soft); }
+  #add-item { background: var(--grad); color: #fff; }
+  .linha { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .esp { flex: 1; }
+  .dica { font-size: 12.5px; color: var(--muted); margin: 6px 0 0 4px; }
+  .aviso, .erro, .info { border-radius: 16px; padding: 12px 14px; font-size: 14px; margin: 10px 0 0; }
+  .aviso { background: #fff6e6; color: #7a4a00; }
+  .erro { background: #ffecea; color: #9b1c12; }
+  .info { background: var(--soft); color: var(--ink); }
+  @media (prefers-color-scheme: dark) { .aviso { background: #2e2310; color: #ffd38a; } .erro { background: #331614; color: #ffb3aa; } }
+  .info b { font-weight: 650; }
+
+  /* item = post */
+  .item { border: 0; }
+  .item-cab { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .item-cab > input { background: transparent; font-weight: 700; font-size: 16px; padding: 6px 8px; flex: 1; min-width: 160px; }
+  .item-cab > input:focus { background: var(--soft); }
+  .num { background: var(--grad); color: #fff; border-radius: 50%; width: 42px; height: 42px; display: grid; place-items: center; font-weight: 800; font-size: 15px; flex: none;
+    box-shadow: 0 0 0 3px var(--card), 0 0 0 5px rgba(201,75,255,.35); }
+  .sub { background: var(--soft); border-radius: 18px; padding: 14px; margin-top: 14px; border: 0; }
+  .sub input, .sub select { background-color: var(--card); }
+
+  /* resultado = stories + destaques */
+  .resumo { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .kpi { background: var(--soft); border-radius: 20px; padding: 14px 16px; position: relative; overflow: hidden; border: 0; }
+  .kpi .r { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+  .kpi .v { font-size: 21px; font-weight: 800; margin-top: 2px; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .kpi .s { font-size: 12px; color: var(--muted); }
+  .kpi::before { content: ""; position: absolute; left: 0; top: 0; width: 100%; height: 4px; background: var(--line); }
+  .kpi.cbs::before { background: var(--cbs); } .kpi.ibs::before { background: var(--ibs); } .kpi.is::before { background: var(--is); }
+  .kpi.tot { background: var(--grad); color: #fff; } .kpi.tot .r, .kpi.tot .s { color: rgba(255,255,255,.85); } .kpi.tot::before { display: none; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 11.5px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tr.tot td { font-weight: 800; border-bottom: 0; }
+  tbody tr:last-child td { border-bottom: 0; }
+  .tag { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; background: var(--soft); color: var(--ink); }
+  .tag.cbs { background: rgba(59,130,246,.14); color: var(--cbs); } .tag.ibs { background: rgba(16,185,129,.14); color: var(--ibs); } .tag.is { background: rgba(201,75,255,.14); color: var(--is); }
+  details { margin-top: 12px; } summary { cursor: pointer; color: var(--pri); font-weight: 700; font-size: 14px; list-style: none; }
+  summary::-webkit-details-marker { display: none; } summary::before { content: "▸ "; } details[open] summary::before { content: "▾ "; }
+  .passos { margin: 8px 0 0; padding-left: 0; list-style: none; counter-reset: p; }
+  .passos li { counter-increment: p; padding: 10px 0 10px 40px; position: relative; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .passos li:last-child { border-bottom: 0; }
+  .passos li::before { content: counter(p); position: absolute; left: 0; top: 10px; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--soft); display: grid; place-items: center; font-size: 12px; font-weight: 800; color: var(--pri); }
+  code, .f { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; background: var(--soft); padding: 2px 7px; border-radius: 8px; }
+  .explica { font-size: 14.5px; margin: 6px 0 0; padding-left: 20px; }
+  .explica li { margin: 5px 0; }
+  .tabela-wrap { overflow-x: auto; margin: 0 -4px; }
+  .cons td { font-size: 13.5px; }
+  .cons tr:hover td { background: var(--soft); }
+  .prosa p, .prosa li { max-width: 72ch; }
+  .linha-tempo { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .ano { background: var(--soft); border-radius: 18px; padding: 14px; font-size: 13.5px; }
+  .ano b { display: block; font-size: 20px; font-weight: 800; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  footer { text-align: center; color: var(--muted); font-size: 12.5px; padding: 0 20px 30px; }
+
+  /* ── celular: barra superior + barra de abas inferior ── */
+  @media (max-width: 860px) {
+    .app { display: block; padding: 0; }
+    .lateral { position: static; height: auto; padding: 0; display: block; }
+    .logo, .lateral-card { display: none; }
+    .topo-movel { display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 5; padding: calc(12px + env(safe-area-inset-top)) 16px 12px;
+      background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+    .topo-movel .logo-ico { width: 34px; height: 34px; border-radius: 11px; font-size: 14px; }
+    .topo-movel b { font-size: 16px; }
+    nav#abas { position: fixed; z-index: 10; left: 0; right: 0; bottom: 0; flex-direction: row; justify-content: space-around; gap: 0;
+      padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--card) 88%, transparent);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--line); }
+    nav#abas button { flex-direction: column; gap: 2px; font-size: 11px; padding: 6px 4px; border-radius: 12px; flex: 1; text-align: center; }
+    nav#abas button.on { background: transparent; box-shadow: none; color: var(--pri); }
+    nav#abas button span { white-space: nowrap; }
+    main { padding: 4px 12px 96px; }
+    .card { padding: 16px; border-radius: 20px; }
+    .resumo { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 4px; }
+    .resumo .kpi { flex: 0 0 72%; scroll-snap-align: start; }
+    #add-item { position: fixed; right: 18px; bottom: calc(78px + env(safe-area-inset-bottom)); z-index: 9; width: 58px; height: 58px; padding: 0;
+      font-size: 0; border-radius: 50%; box-shadow: 0 10px 24px rgba(201,75,255,.45); }
+    #add-item::before { content: "+"; font-size: 30px; font-weight: 400; line-height: 1; }
+  }
+  @media print { nav#abas, .lateral, .topo-movel, .nao-imprimir { display: none !important; } .app { display: block; } .aba { display: none !important; }
+    #aba-calc { display: block !important; } body { background: #fff; } .card { box-shadow: none; border: 1px solid #ddd; } }
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="lateral">
+  <div class="logo"><div class="logo-ico">%</div><div><b>Reforma Fácil</b><small>CBS · IBS · Imposto Seletivo</small></div></div>
+  <nav id="abas">
+    <button data-aba="calc" class="on"><svg viewBox="0 0 24 24"><rect x="4" y="2.5" width="16" height="19" rx="3"/><path d="M8 7h8M8 12h2M14 12h2M8 16h2M14 16h2"/></svg><span>Calcular</span></button>
+    <button data-aba="entenda"><svg viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5zM12 6.5v13"/></svg><span>Entenda</span></button>
+    <button data-aba="cons"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5 16 16"/></svg><span>Consultar</span></button>
+    <button data-aba="sobre"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5v.5"/></svg><span>Sobre</span></button>
+  </nav>
+  <div class="lateral-card"><b>Baseado na calculadora oficial</b> da Receita Federal (LC 214/2025). Uso educativo, sem valor fiscal.</div>
+</aside>
+
+<main>
+  <div class="topo-movel"><div class="logo-ico">%</div><b>Reforma Fácil</b></div>
+
+  <!-- ───────────── CALCULAR ───────────── -->
+  <section id="aba-calc" class="aba on">
+    <div class="card">
+      <div class="post-cab"><div class="av">R$</div><div><b>Nova simulação</b><small>Escolha a data e as alíquotas; depois adicione os itens</small></div></div>
+      <div class="grade">
+        <div>
+          <label for="data">Data do fato gerador</label>
+          <input type="date" id="data" min="2026-01-01" max="2033-12-31">
+          <p class="dica">Define quais regras e alíquotas valem.</p>
+        </div>
+        <div>
+          <label for="uf">Estado (UF)</label>
+          <select id="uf"></select>
+          <p class="dica">Informativo: no momento as alíquotas são únicas para o país.</p>
+        </div>
+      </div>
+      <div id="painel-aliq"></div>
+    </div>
+
+    <div id="itens"></div>
+    <div class="linha nao-imprimir" style="margin-bottom:20px">
+      <button class="btn sec" id="add-item">+ Adicionar item</button>
+      <button class="btn sec" id="exemplo">Carregar exemplo</button>
+      <span class="esp"></span>
+      <button class="btn sec" id="limpar">Limpar tudo</button>
+    </div>
+
+    <div id="resultado"></div>
+  </section>
+
+  <!-- ───────────── ENTENDA ───────────── -->
+  <section id="aba-entenda" class="aba prosa">
+    <div class="card">
+      <h2>O que muda</h2>
+      <p>A Reforma Tributária do Consumo (Emenda Constitucional 132/2023 e Lei Complementar 214/2025) troca cinco tributos
+        (PIS, Cofins, IPI, ICMS e ISS) por três:</p>
+      <div class="resumo">
+        <div class="kpi cbs"><div class="r">CBS</div><div class="v" style="font-size:16px">Contribuição Social sobre Bens e Serviços</div><div class="s">Federal. Substitui PIS e Cofins.</div></div>
+        <div class="kpi ibs"><div class="r">IBS</div><div class="v" style="font-size:16px">Imposto sobre Bens e Serviços</div><div class="s">Estados (IBS UF) e municípios (IBS Mun). Substitui ICMS e ISS.</div></div>
+        <div class="kpi is"><div class="r">IS</div><div class="v" style="font-size:16px">Imposto Seletivo</div><div class="s">Federal, a partir de 2027. Incide sobre itens prejudiciais à saúde ou ao meio ambiente (ex.: cigarro, bebida alcoólica).</div></div>
+      </div>
+      <p>CBS e IBS formam o chamado <b>IVA dual</b>: incidem sobre o valor da operação, são cobrados "por fora" (destacados na nota, sem
+        entrar na própria base) e geram crédito para quem compra, de forma que o tributo é pago, ao final, só sobre o valor que cada etapa acrescentou.</p>
+    </div>
+
+    <div class="card">
+      <h2>Linha do tempo da transição</h2>
+      <div class="linha-tempo">
+        <div class="ano"><b>2026</b>Ano de teste: CBS 0,9% e IBS 0,1% destacados na nota (compensáveis com PIS/Cofins). É o que a calculadora usa por padrão em 2026.</div>
+        <div class="ano"><b>2027</b>CBS passa a valer de verdade e PIS/Cofins acabam. Começa o Imposto Seletivo. IBS segue em 0,1% (0,05% UF + 0,05% Mun).</div>
+        <div class="ano"><b>2029 a 2032</b>Transição do IBS: ICMS e ISS caem aos poucos enquanto o IBS sobe na mesma proporção.</div>
+        <div class="ano"><b>2033</b>Sistema novo completo: ICMS e ISS deixam de existir.</div>
+      </div>
+      <p class="dica">A partir de 2027 as alíquotas de referência ainda não estão na base oficial; por isso a calculadora pede que você as informe (o resultado é uma <i>simulação</i>).</p>
+    </div>
+
+    <div class="card">
+      <h2>Os códigos que você precisa conhecer</h2>
+      <h3>CST — Código de Situação Tributária</h3>
+      <p>Diz <b>qual é o tipo de tratamento</b> da operação. Exemplos: <code>000</code> tributação integral, <code>200</code> alíquota reduzida,
+        <code>410</code> imunidade/não incidência, <code>510</code> diferimento, <code>550</code> suspensão.</p>
+      <h3>cClassTrib — Código de Classificação Tributária</h3>
+      <p>Detalha o CST: <b>qual regra específica</b> da lei se aplica. Os 3 primeiros dígitos são o CST. Exemplo: <code>200003</code>
+        = produtos da Cesta Básica Nacional (redução de 100%), <code>200028</code> = serviços de educação (redução de 60%).
+        É a cClassTrib que define o percentual de redução, o tipo de alíquota e a fórmula do cálculo. Use a aba <i>Consultar classificações</i> para encontrar a sua.</p>
+      <h3>NCM e NBS</h3>
+      <p>Códigos do produto (NCM) e do serviço (NBS). Muitas cClassTrib só valem para certos NCM/NBS (ex.: só para itens do Anexo I).
+        Esta ferramenta mostra a exigência, mas não confere o vínculo NCM × cClassTrib: <b>confira na legislação ou na API oficial</b>.</p>
+    </div>
+
+    <div class="card">
+      <h2>Como o cálculo é feito</h2>
+      <ol class="explica">
+        <li><b>Base de cálculo</b> = valor da operação. Se há Imposto Seletivo, ele entra na base da CBS/IBS. O valor é arredondado a 2 casas.</li>
+        <li><b>Alíquota nominal</b> = alíquota do tributo (de referência, fixa, setorial ou informada).</li>
+        <li><b>Alíquota efetiva</b> = alíquota × (1 − redução). Ex.: 0,90% com redução de 60% → 0,36%. Arredondada a 4 casas.</li>
+        <li><b>Tributo</b> = base × alíquota efetiva, arredondado a 2 casas.</li>
+        <li>Se houver <b>diferimento</b>, parte (ou todo) o tributo é adiado para a etapa seguinte e não é pago agora.</li>
+        <li><b>Suspensão</b>: o tributo fica zerado, mas a nota informa quanto seria devido na "tributação regular".</li>
+        <li><b>Isenção / imunidade</b>: não há destaque de CBS/IBS.</li>
+      </ol>
+      <p>Os arredondamentos seguem a regra oficial (ABNT NBR 5891, "arredondamento bancário"): quando o dígito descartado é exatamente 5, arredonda-se para o par mais próximo.
+        Ex.: 0,125 → 0,12 e 0,135 → 0,14.</p>
+    </div>
+  </section>
+
+  <!-- ───────────── CONSULTAR ───────────── -->
+  <section id="aba-cons" class="aba">
+    <div class="card">
+      <h2>Classificações tributárias (cClassTrib) vigentes</h2>
+      <div class="grade">
+        <div><label for="c-busca">Buscar (código ou palavra)</label><input id="c-busca" placeholder="ex.: educação, cesta básica, 200028"></div>
+        <div><label for="c-cst">CST</label><select id="c-cst"></select></div>
+        <div><label for="c-data">Vigentes em</label><input type="date" id="c-data" min="2026-01-01"></div>
+      </div>
+      <p class="dica" id="c-conta"></p>
+      <div class="tabela-wrap"><table class="cons" id="c-tab"></table></div>
+    </div>
+  </section>
+
+  <!-- ───────────── SOBRE ───────────── -->
+  <section id="aba-sobre" class="aba prosa">
+    <div class="card">
+      <h2>Sobre esta ferramenta</h2>
+      <p>Programa feito a partir do código-fonte da <b>calculadora-rtc-regime-regular</b> publicada pela Receita Federal/Serpro.
+        As tabelas (CST, cClassTrib, percentuais de redução, alíquotas e fórmulas) vêm do banco de dados oficial que acompanha o projeto,
+        e o motor de cálculo reproduz as mesmas fórmulas e regras de arredondamento.</p>
+      <p id="sobre-versao"></p>
+      <h3>O que esta ferramenta faz</h3>
+      <ul>
+        <li>Calcula CBS, IBS estadual, IBS municipal e Imposto Seletivo, item a item e no total.</li>
+        <li>Mostra o passo a passo de cada conta, com a fórmula oficial.</li>
+        <li>Trata redução de alíquota, alíquota fixa e setorial, diferimento, suspensão (com tributação regular), isenção e imunidade.</li>
+        <li>Gera o JSON de entrada para a API oficial, se você quiser conferir o resultado nela.</li>
+      </ul>
+      <h3>Limites (o que não faz)</h3>
+      <ul>
+        <li>Não confere o vínculo entre NCM/NBS e a cClassTrib, nem o tipo de documento fiscal.</li>
+        <li>Não calcula compras governamentais, monofasia de combustíveis, transferência de crédito e ajustes (CST 620, 800, 810, 811 e 820). Parte disso também ainda não está liberada na calculadora oficial.</li>
+        <li>Não é consultoria tributária: o resultado é uma estimativa para entender as regras. Confirme antes de emitir documentos.</li>
+      </ul>
+      <p>Os dados ficam só no seu computador (o programa funciona sem internet).</p>
+    </div>
+  </section>
+  <footer>Baseado na calculadora oficial da Receita Federal · uso educativo, sem valor fiscal</footer>
+</main>
+</div>
+
+<script src="dados.js"></script>
+<script src="motor.js"></script>
+<script src="app.js"></script>
+<script>
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+  }
+</script>
+</body>
+</html>
