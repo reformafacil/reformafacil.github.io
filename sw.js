@@ -1,7 +1,7 @@
 /* Service worker: guarda o app no aparelho para funcionar sem internet. */
-const VERSAO = 'reforma-facil-v2';
+const VERSAO = 'reforma-facil-v3';
 const ARQUIVOS = [
-  './', './index.html', './app.js', './motor.js', './dados.js', './manifest.webmanifest',
+  './', './index.html', './app.html', './inicio.js', './app.js', './motor.js', './dados.js', './manifest.webmanifest',
   './conta.js', './nuvem.js', './firebase-config.js',
   './icones/icone-192.png', './icones/icone-512.png', './icones/icone-maskable-512.png',
   './icones/apple-touch-icon.png', './icones/favicon-32.png',
@@ -25,6 +25,6 @@ self.addEventListener('fetch', (e) => {
       const copia = r.clone();
       caches.open(VERSAO).then((c) => c.put(e.request, copia));
       return r;
-    }).catch(() => caches.match(e.request).then((r) => r || caches.match('./index.html')))
+    }).catch(() => caches.match(e.request).then((r) => r || caches.match(new URL(e.request.url).pathname.endsWith('app.html') ? './app.html' : './index.html')))
   );
 });

@@ -4,16 +4,35 @@
   "short_name": "Reforma Fácil",
   "description": "Calcule e entenda CBS, IBS e Imposto Seletivo da Reforma Tributária, com as regras da calculadora oficial da Receita Federal.",
   "lang": "pt-BR",
-  "start_url": "./index.html",
+  "start_url": "./app.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0b0c14",
   "theme_color": "#6d5dfc",
-  "categories": ["finance", "business", "education"],
+  "categories": [
+    "finance",
+    "business",
+    "education"
+  ],
   "icons": [
-    { "src": "icones/icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icones/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icones/icone-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icones/icone-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icones/icone-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icones/icone-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }

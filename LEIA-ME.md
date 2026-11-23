@@ -1,6 +1,9 @@
 # Calculadora da Reforma Tributária (CBS · IBS · IS)
 
-Para usar: dê **dois cliques em `index.html`**. O programa abre no navegador e funciona sem internet.
+Site: <https://joaovcbarcelos.github.io/reforma-facil/>
+
+- `index.html`: página inicial (apresentação, demonstração grátis e pedido de acesso)
+- `app.html`: a calculadora, com login
 
 ## Login e contas
 O app exige login (Firebase). Cada pessoa tem uma conta individual, criada por você na aba **Admin**,
@@ -15,7 +18,8 @@ Configuração e funcionamento: [CONFIGURAR-FIREBASE.md](CONFIGURAR-FIREBASE.md)
 - **Consultar classificações**: busca nas 170 classificações vigentes, com o percentual de redução de cada uma.
 
 ## Arquivos
-- `index.html`, `app.js`: interface
+- `index.html` + `inicio.js`: página inicial
+- `app.html`, `app.js`, `conta.js`, `nuvem.js`: a calculadora, o login e o painel do administrador
 - `motor.js`: motor de cálculo (mesmas fórmulas e arredondamentos da calculadora da Receita)
 - `dados.js`: tabelas extraídas do banco oficial (versão V0073)
 - `ferramentas/`: script para atualizar `dados.js` e testes do motor

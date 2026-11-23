@@ -4,400 +4,318 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#6d5dfc">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Reforma Fácil">
-<meta name="description" content="Calcule e entenda CBS, IBS e Imposto Seletivo da Reforma Tributária.">
+<title>Reforma Fácil — Calcule CBS, IBS e Imposto Seletivo em segundos</title>
+<meta name="description" content="Calculadora da Reforma Tributária com as regras oficiais da Receita Federal. Calcule CBS, IBS e Imposto Seletivo, entenda cada passo e organize seus clientes.">
+<meta property="og:title" content="Reforma Fácil — a calculadora da Reforma Tributária">
+<meta property="og:description" content="CBS, IBS e Imposto Seletivo com as regras oficiais da Receita Federal, explicados passo a passo.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="icones/icone-512.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="icones/favicon-32.png">
 <link rel="apple-touch-icon" href="icones/apple-touch-icon.png">
-<title>Reforma Fácil — CBS, IBS e IS</title>
 <style>
   :root {
-    --bg: #f0f2f7; --card: #ffffff; --ink: #0f1222; --muted: #6b7088; --line: #e8eaf2; --soft: #f5f6fb;
+    --bg: #f0f2f7; --card: #fff; --ink: #0f1222; --muted: #5d6280; --line: #e6e8f0; --soft: #f5f6fb;
     --grad: linear-gradient(135deg, #6d5dfc 0%, #c94bff 50%, #ff6a88 100%);
-    --pri: #6d5dfc; --pri-ink: #ffffff; --ok: #12b76a; --err: #f04438;
-    --cbs: #3b82f6; --ibs: #10b981; --is: #c94bff;
-    --r: 22px; --sombra: 0 1px 2px rgba(16,18,34,.04), 0 8px 24px rgba(16,18,34,.06);
+    --pri: #6d5dfc; --ok: #12b76a; --err: #f04438; --cbs: #3b82f6; --ibs: #10b981; --is: #c94bff;
+    --r: 22px; --sombra: 0 1px 2px rgba(16,18,34,.04), 0 10px 30px rgba(16,18,34,.07);
   }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #0b0c14; --card: #151724; --ink: #f2f3fa; --muted: #9096b2; --line: #24273a; --soft: #1c1f30;
-      --pri: #8b7dff; --sombra: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35); }
+    :root { --bg: #0b0c14; --card: #151724; --ink: #f2f3fa; --muted: #9aa0bd; --line: #24273a; --soft: #1c1f30;
+      --pri: #8b7dff; --sombra: 0 1px 2px rgba(0,0,0,.3), 0 12px 34px rgba(0,0,0,.35); }
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
-  body { margin: 0; font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+  body { margin: 0; font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
     background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; }
+  a { color: var(--pri); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 22px; }
+  .grad-txt { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
-  /* ── estrutura: barra lateral + feed ── */
-  .app { display: grid; grid-template-columns: 260px minmax(0, 720px); justify-content: center; gap: 28px; padding: 0 20px; }
-  .lateral { position: sticky; top: 0; height: 100vh; padding: 26px 0; display: flex; flex-direction: column; gap: 22px; }
-  .logo { display: flex; align-items: center; gap: 12px; padding: 0 10px; }
-  .logo-ico { width: 44px; height: 44px; border-radius: 14px; background: var(--grad); display: grid; place-items: center;
-    color: #fff; font-weight: 800; font-size: 18px; box-shadow: 0 6px 18px rgba(201,75,255,.35); }
-  .logo b { display: block; font-size: 17px; letter-spacing: -.01em; }
-  .logo small { color: var(--muted); font-size: 12.5px; }
-  nav#abas { display: flex; flex-direction: column; gap: 4px; }
-  nav#abas button { display: flex; align-items: center; gap: 14px; background: transparent; color: var(--ink); border: 0;
-    padding: 12px 14px; font: inherit; font-size: 15.5px; font-weight: 500; border-radius: 16px; cursor: pointer; text-align: left;
-    transition: background .15s; }
-  nav#abas button svg { width: 24px; height: 24px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
-  nav#abas button:hover { background: var(--card); }
-  nav#abas button.on { background: var(--card); font-weight: 700; box-shadow: var(--sombra); }
-  nav#abas button.on svg { stroke: var(--pri); stroke-width: 2.3; }
-  .lateral-card { margin-top: auto; background: var(--card); border-radius: var(--r); padding: 16px; box-shadow: var(--sombra); font-size: 13px; color: var(--muted); }
-  .lateral-card b { color: var(--ink); }
-  main { padding: 26px 0 60px; min-width: 0; }
-  .topo-movel { display: none; }
+  /* topo */
+  header { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    background: color-mix(in srgb, var(--bg) 80%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent); }
+  .topo { display: flex; align-items: center; gap: 14px; height: 66px; }
+  .marca { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-weight: 800; font-size: 18px; }
+  .ico { width: 38px; height: 38px; border-radius: 12px; background: var(--grad); color: #fff; display: grid; place-items: center; font-weight: 800;
+    box-shadow: 0 6px 16px rgba(201,75,255,.35); }
+  .menu { display: flex; gap: 22px; margin-left: 26px; }
+  .menu a { color: var(--muted); text-decoration: none; font-weight: 600; font-size: 14.5px; }
+  .menu a:hover { color: var(--ink); }
+  .esp { flex: 1; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 99px; padding: 12px 22px;
+    font: inherit; font-weight: 700; cursor: pointer; text-decoration: none; transition: transform .1s, filter .15s; white-space: nowrap; }
+  .btn:active { transform: scale(.97); }
+  .btn.pri { background: var(--grad); color: #fff; box-shadow: 0 8px 22px rgba(109,93,252,.32); }
+  .btn.pri:hover { filter: brightness(1.06); }
+  .btn.sec { background: var(--card); color: var(--ink); box-shadow: var(--sombra); }
+  .btn.peq { padding: 9px 16px; font-size: 14.5px; }
 
-  .aba { display: none; animation: surgir .25s ease; } .aba.on { display: block; }
-  @keyframes surgir { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  /* hero */
+  .hero { padding: 64px 0 40px; display: grid; grid-template-columns: 1.05fr .95fr; gap: 48px; align-items: center; }
+  .selo { display: inline-flex; align-items: center; gap: 8px; background: var(--card); border-radius: 99px; padding: 6px 14px 6px 8px;
+    font-size: 13.5px; font-weight: 600; color: var(--muted); box-shadow: var(--sombra); }
+  .selo b { background: var(--grad); color: #fff; border-radius: 99px; padding: 2px 10px; font-size: 12px; }
+  h1 { font-size: clamp(34px, 5vw, 56px); line-height: 1.07; letter-spacing: -.03em; margin: 18px 0 16px; }
+  .lead { font-size: 18.5px; color: var(--muted); margin: 0 0 26px; max-width: 34em; }
+  .ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+  .provas { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 28px; color: var(--muted); font-size: 14px; }
+  .provas span::before { content: "✓ "; color: var(--ok); font-weight: 800; }
 
-  /* ── cards (posts) ── */
-  .card { background: var(--card); border-radius: var(--r); padding: 20px 22px; margin-bottom: 16px; box-shadow: var(--sombra); border: 0; }
-  .card h2 { margin: 0 0 14px; font-size: 18px; letter-spacing: -.01em; }
-  .card h3 { margin: 18px 0 8px; font-size: 15px; }
-  .post-cab { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-  .post-cab .av { width: 42px; height: 42px; border-radius: 50%; background: var(--grad); color: #fff; display: grid; place-items: center; font-weight: 800; flex: none; }
-  .post-cab b { display: block; font-size: 15.5px; } .post-cab small { color: var(--muted); font-size: 13px; }
-  .titulo-feed { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin: 22px 6px 10px; }
-
-  .grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
-  label { display: block; font-size: 12.5px; color: var(--muted); margin: 0 0 6px 4px; font-weight: 600; }
-  input, select { width: 100%; padding: 11px 14px; border: 1.5px solid transparent; border-radius: 14px; font: inherit;
-    background: var(--soft); color: var(--ink); transition: border-color .15s, background .15s; -webkit-appearance: none; appearance: none; }
+  /* demo */
+  .demo { background: var(--card); border-radius: 28px; padding: 22px; box-shadow: var(--sombra); position: relative; }
+  .demo::before { content: ""; position: absolute; inset: -2px; border-radius: 30px; background: var(--grad); z-index: -1; opacity: .55; filter: blur(22px); }
+  .demo h3 { margin: 0 0 4px; font-size: 17px; } .demo .sub { color: var(--muted); font-size: 13.5px; margin: 0 0 14px; }
+  label { display: block; font-size: 12.5px; color: var(--muted); font-weight: 600; margin: 0 0 6px 4px; }
+  input, select, textarea { width: 100%; padding: 12px 14px; border: 1.5px solid transparent; border-radius: 14px; font: inherit; font-size: 15px;
+    background: var(--soft); color: var(--ink); -webkit-appearance: none; appearance: none; }
   select { background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
     background-position: calc(100% - 18px) 52%, calc(100% - 13px) 52%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 34px; }
-  input:focus, select:focus { outline: none; border-color: var(--pri); background-color: var(--card); }
-  input::placeholder { color: var(--muted); opacity: .8; }
-  input[type=checkbox] { -webkit-appearance: none; appearance: none; width: 42px; height: 24px; padding: 0; border-radius: 99px; background: var(--line);
-    position: relative; cursor: pointer; flex: none; margin: 0 10px 0 0; border: 0; transition: background .2s; }
-  input[type=checkbox]::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff;
-    box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s; }
-  input[type=checkbox]:checked { background: var(--grad); }
-  input[type=checkbox]:checked::after { transform: translateX(18px); }
-  .chk { display: flex; align-items: center; font-size: 14.5px; color: var(--ink); font-weight: 500; cursor: pointer; margin: 0; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--pri); background-color: var(--card); }
+  .g2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .res { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .kpi { background: var(--soft); border-radius: 16px; padding: 10px 12px; position: relative; overflow: hidden; }
+  .kpi::before { content: ""; position: absolute; left: 0; top: 0; right: 0; height: 3px; }
+  .kpi.cbs::before { background: var(--cbs); } .kpi.ibs::before { background: var(--ibs); }
+  .kpi .r { font-size: 12px; color: var(--muted); font-weight: 600; } .kpi .v { font-size: 19px; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .kpi.tot { background: var(--grad); color: #fff; } .kpi.tot .r { color: rgba(255,255,255,.85); }
+  .explica { margin: 12px 0 0; padding: 12px 14px; background: var(--soft); border-radius: 14px; font-size: 14px; }
+  .explica b { font-weight: 700; }
+  .economia { color: var(--ok); font-weight: 700; }
+  .demo .rod { font-size: 12px; color: var(--muted); margin: 10px 0 0; }
 
-  .btn { background: var(--grad); color: #fff; border: 0; padding: 11px 20px; border-radius: 99px; font: inherit; font-weight: 700; cursor: pointer;
-    box-shadow: 0 6px 16px rgba(109,93,252,.28); transition: transform .1s, filter .15s; }
-  .btn:hover { filter: brightness(1.06); } .btn:active { transform: scale(.97); }
-  .btn.sec { background: var(--card); color: var(--ink); box-shadow: var(--sombra); }
-  .btn.peq { padding: 7px 14px; font-size: 13px; box-shadow: none; background: var(--soft); color: var(--ink); }
-  .btn.del { background: transparent; color: var(--muted); box-shadow: none; padding: 6px 12px; font-weight: 600; }
-  .btn.del:hover { color: var(--err); background: var(--soft); }
-  #add-item { background: var(--grad); color: #fff; }
-  .linha { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-  .esp { flex: 1; }
-  .dica { font-size: 12.5px; color: var(--muted); margin: 6px 0 0 4px; }
-  .aviso, .erro, .info { border-radius: 16px; padding: 12px 14px; font-size: 14px; margin: 10px 0 0; }
-  .aviso { background: #fff6e6; color: #7a4a00; }
-  .erro { background: #ffecea; color: #9b1c12; }
-  .info { background: var(--soft); color: var(--ink); }
-  @media (prefers-color-scheme: dark) { .aviso { background: #2e2310; color: #ffd38a; } .erro { background: #331614; color: #ffb3aa; } }
-  .info b { font-weight: 650; }
+  /* seções */
+  section { padding: 56px 0; }
+  .tit { text-align: center; max-width: 720px; margin: 0 auto 34px; }
+  .tit .pre { font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  .tit h2 { font-size: clamp(28px, 3.6vw, 40px); letter-spacing: -.025em; line-height: 1.15; margin: 8px 0 10px; }
+  .tit p { color: var(--muted); margin: 0; font-size: 17px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .card { background: var(--card); border-radius: var(--r); padding: 22px; box-shadow: var(--sombra); }
+  .card h3 { margin: 12px 0 6px; font-size: 17.5px; letter-spacing: -.01em; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+  .ic { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-size: 22px; background: var(--soft); }
+  .trib { border-top: 5px solid var(--line); }
+  .trib.cbs { border-color: var(--cbs); } .trib.ibs { border-color: var(--ibs); } .trib.is { border-color: var(--is); }
+  .trib .sig { font-size: 28px; font-weight: 800; letter-spacing: -.02em; }
+  .antes { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; margin: 0 0 26px; font-weight: 700; }
+  .antes .x { background: var(--card); border-radius: 99px; padding: 6px 14px; box-shadow: var(--sombra); text-decoration: line-through; color: var(--muted); font-weight: 600; }
+  .antes .seta { font-size: 22px; color: var(--muted); }
+  .antes .n { border-radius: 99px; padding: 6px 14px; color: #fff; }
+  .linha-tempo { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; position: relative; }
+  .ano { background: var(--card); border-radius: var(--r); padding: 20px; box-shadow: var(--sombra); }
+  .ano b { display: block; font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+  .ano p { margin: 6px 0 0; color: var(--muted); font-size: 14.5px; }
+  .ano.agora { outline: 2px solid var(--pri); }
+  .ano .tag { display: inline-block; background: var(--grad); color: #fff; font-size: 11.5px; font-weight: 700; border-radius: 99px; padding: 1px 9px; margin-left: 6px; vertical-align: middle; }
+  .passos { counter-reset: p; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .passo { counter-increment: p; }
+  .passo::before { content: counter(p); width: 40px; height: 40px; border-radius: 50%; background: var(--grad); color: #fff; display: grid; place-items: center; font-weight: 800; }
+  .publico { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .publico span { background: var(--card); border-radius: 99px; padding: 10px 18px; box-shadow: var(--sombra); font-weight: 600; }
+  details { background: var(--card); border-radius: 18px; padding: 16px 20px; box-shadow: var(--sombra); margin-bottom: 10px; }
+  summary { cursor: pointer; font-weight: 700; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+  summary::-webkit-details-marker { display: none; } summary::after { content: "+"; font-size: 22px; line-height: 1; color: var(--pri); }
+  details[open] summary::after { content: "−"; }
+  details p { color: var(--muted); margin: 10px 0 0; }
+  .faq { max-width: 780px; margin: 0 auto; }
+  .acesso { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; align-items: center; background: var(--card); border-radius: 30px; padding: 36px; box-shadow: var(--sombra); }
+  .acesso h2 { font-size: clamp(26px, 3.2vw, 36px); letter-spacing: -.025em; line-height: 1.15; margin: 0 0 12px; }
+  .acesso ul { padding-left: 0; list-style: none; margin: 16px 0 0; } .acesso li { margin: 8px 0; } .acesso li::before { content: "✓  "; color: var(--ok); font-weight: 800; }
+  form { display: grid; gap: 12px; }
+  .msg { border-radius: 14px; padding: 12px 14px; font-size: 14.5px; }
+  .msg.ok { background: rgba(18,183,106,.13); } .msg.erro { background: rgba(240,68,56,.13); }
+  footer { padding: 36px 0 50px; color: var(--muted); font-size: 13.5px; text-align: center; }
+  footer p { margin: 4px 0; }
 
-  /* item = post */
-  .item { border: 0; }
-  .item-cab { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
-  .item-cab > input { background: transparent; font-weight: 700; font-size: 16px; padding: 6px 8px; flex: 1; min-width: 160px; }
-  .item-cab > input:focus { background: var(--soft); }
-  .num { background: var(--grad); color: #fff; border-radius: 50%; width: 42px; height: 42px; display: grid; place-items: center; font-weight: 800; font-size: 15px; flex: none;
-    box-shadow: 0 0 0 3px var(--card), 0 0 0 5px rgba(201,75,255,.35); }
-  .sub { background: var(--soft); border-radius: 18px; padding: 14px; margin-top: 14px; border: 0; }
-  .sub input, .sub select { background-color: var(--card); }
-
-  /* resultado = stories + destaques */
-  .resumo { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-  .kpi { background: var(--soft); border-radius: 20px; padding: 14px 16px; position: relative; overflow: hidden; border: 0; }
-  .kpi .r { font-size: 12.5px; color: var(--muted); font-weight: 600; }
-  .kpi .v { font-size: 21px; font-weight: 800; margin-top: 2px; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
-  .kpi .s { font-size: 12px; color: var(--muted); }
-  .kpi::before { content: ""; position: absolute; left: 0; top: 0; width: 100%; height: 4px; background: var(--line); }
-  .kpi.cbs::before { background: var(--cbs); } .kpi.ibs::before { background: var(--ibs); } .kpi.is::before { background: var(--is); }
-  .kpi.tot { background: var(--grad); color: #fff; } .kpi.tot .r, .kpi.tot .s { color: rgba(255,255,255,.85); } .kpi.tot::before { display: none; }
-
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  th { font-size: 11.5px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
-  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  tr.tot td { font-weight: 800; border-bottom: 0; }
-  tbody tr:last-child td { border-bottom: 0; }
-  .tag { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; background: var(--soft); color: var(--ink); }
-  .tag.cbs { background: rgba(59,130,246,.14); color: var(--cbs); } .tag.ibs { background: rgba(16,185,129,.14); color: var(--ibs); } .tag.is { background: rgba(201,75,255,.14); color: var(--is); }
-  details { margin-top: 12px; } summary { cursor: pointer; color: var(--pri); font-weight: 700; font-size: 14px; list-style: none; }
-  summary::-webkit-details-marker { display: none; } summary::before { content: "▸ "; } details[open] summary::before { content: "▾ "; }
-  .passos { margin: 8px 0 0; padding-left: 0; list-style: none; counter-reset: p; }
-  .passos li { counter-increment: p; padding: 10px 0 10px 40px; position: relative; border-bottom: 1px solid var(--line); font-size: 14px; }
-  .passos li:last-child { border-bottom: 0; }
-  .passos li::before { content: counter(p); position: absolute; left: 0; top: 10px; width: 28px; height: 28px; border-radius: 50%;
-    background: var(--soft); display: grid; place-items: center; font-size: 12px; font-weight: 800; color: var(--pri); }
-  code, .f { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; background: var(--soft); padding: 2px 7px; border-radius: 8px; }
-  .explica { font-size: 14.5px; margin: 6px 0 0; padding-left: 20px; }
-  .explica li { margin: 5px 0; }
-  .tabela-wrap { overflow-x: auto; margin: 0 -4px; }
-  .cons td { font-size: 13.5px; }
-  .cons tr:hover td { background: var(--soft); }
-  .prosa p, .prosa li { max-width: 72ch; }
-  .linha-tempo { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-  .ano { background: var(--soft); border-radius: 18px; padding: 14px; font-size: 13.5px; }
-  .ano b { display: block; font-size: 20px; font-weight: 800; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  footer { text-align: center; color: var(--muted); font-size: 12.5px; padding: 0 20px 30px; }
-
-
-  /* ── login ── */
-  #tela-login { display: none; position: fixed; inset: 0; z-index: 50; background: var(--bg); overflow-y: auto;
-    padding: max(40px, env(safe-area-inset-top)) 20px 40px; }
-  body.deslogado #tela-login { display: grid; place-items: center; }
-  body.deslogado .app { visibility: hidden; }
-  .login-box { width: 100%; max-width: 400px; }
-  .login-box .logo-ico { width: 64px; height: 64px; border-radius: 20px; font-size: 26px; margin: 0 auto 14px; }
-  .login-box h1 { text-align: center; margin: 0; font-size: 26px; letter-spacing: -.02em; }
-  .login-box .sub-t { text-align: center; color: var(--muted); margin: 4px 0 22px; }
-  .login-box form { display: grid; gap: 12px; }
-  .login-box .btn { width: 100%; padding: 13px; font-size: 16px; }
-  .login-box a { color: var(--pri); font-weight: 600; font-size: 14px; text-decoration: none; text-align: center; display: block; margin-top: 4px; }
-  body.carregando #tela-login form, body.carregando #tela-login a { display: none; }
-  body.carregando #tela-login .sub-t::after { content: " — carregando…"; }
-
-  /* ── clientes (estilo stories) ── */
-  .barra-clientes { display: flex; gap: 14px; overflow-x: auto; padding: 4px 2px 10px; scrollbar-width: none; }
-  .barra-clientes::-webkit-scrollbar { display: none; }
-  .cli { background: none; border: 0; padding: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px;
-    width: 72px; flex: none; color: var(--ink); font: inherit; }
-  .cli-av { width: 62px; height: 62px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 18px;
-    background: var(--card); color: var(--ink); box-shadow: 0 0 0 2px var(--line); border: 3px solid var(--bg); transition: box-shadow .15s; }
-  .cli.on .cli-av { background: var(--grad); color: #fff; box-shadow: 0 0 0 3px #c94bff; }
-  .cli.novo .cli-av { font-size: 28px; font-weight: 400; color: var(--pri); border-style: dashed; }
-  .cli-nome { font-size: 12px; max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .cli.on .cli-nome { font-weight: 700; }
-  .salvo { font-size: 12.5px; color: var(--muted); } .salvo[data-tipo=ok]::before { content: "✓ "; color: var(--ok); }
-  .salvo[data-tipo=erro] { color: var(--err); }
-
-  /* ── conta / admin ── */
-  .conta-card { font-size: 13px; color: var(--muted); }
-  .conta-card:empty { display: none; }
-  .conta-movel { display: none; }
-  body:not(.admin) .so-admin { display: none !important; }
-  .usuario { background: var(--soft); border-radius: 18px; padding: 14px; margin-top: 12px; }
-  .usuario input { background-color: var(--card); }
-  @media (max-width: 860px) { .conta-movel { display: block; } }
-  /* ── celular: barra superior + barra de abas inferior ── */
-  @media (max-width: 860px) {
-    .app { display: block; padding: 0; }
-    .lateral { position: static; height: auto; padding: 0; display: block; }
-    .logo, .lateral-card { display: none; }
-    .topo-movel { display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 5; padding: calc(12px + env(safe-area-inset-top)) 16px 12px;
-      background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
-    .topo-movel .logo-ico { width: 34px; height: 34px; border-radius: 11px; font-size: 14px; }
-    .topo-movel b { font-size: 16px; }
-    nav#abas { position: fixed; z-index: 10; left: 0; right: 0; bottom: 0; flex-direction: row; justify-content: space-around; gap: 0;
-      padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--card) 88%, transparent);
-      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--line); }
-    nav#abas button { flex-direction: column; gap: 2px; font-size: 11px; padding: 6px 4px; border-radius: 12px; flex: 1; text-align: center; }
-    nav#abas button.on { background: transparent; box-shadow: none; color: var(--pri); }
-    nav#abas button span { white-space: nowrap; }
-    main { padding: 4px 12px 96px; }
-    .card { padding: 16px; border-radius: 20px; }
-    .resumo { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 4px; }
-    .resumo .kpi { flex: 0 0 72%; scroll-snap-align: start; }
-    #add-item { position: fixed; right: 18px; bottom: calc(78px + env(safe-area-inset-bottom)); z-index: 9; width: 58px; height: 58px; padding: 0;
-      font-size: 0; border-radius: 50%; box-shadow: 0 10px 24px rgba(201,75,255,.45); }
-    #add-item::before { content: "+"; font-size: 30px; font-weight: 400; line-height: 1; }
+  @media (max-width: 900px) {
+    .hero, .acesso { grid-template-columns: 1fr; }
+    .hero { padding-top: 34px; gap: 30px; }
+    .linha-tempo, .passos { grid-template-columns: 1fr 1fr; }
+    .menu { display: none; }
+    .acesso { padding: 24px; }
   }
-  @media print { nav#abas, .lateral, .topo-movel, .nao-imprimir { display: none !important; } .app { display: block; } .aba { display: none !important; }
-    #aba-calc { display: block !important; } body { background: #fff; } .card { box-shadow: none; border: 1px solid #ddd; } }
+  @media (max-width: 520px) {
+    .linha-tempo, .passos { grid-template-columns: 1fr; }
+    .res { grid-template-columns: 1fr 1fr; } .res .tot { grid-column: span 2; }
+    .g2 { grid-template-columns: 1fr; }
+    .topo .btn.sec { display: none; }
+  }
 </style>
 </head>
 <body>
-<div id="tela-login">
-  <div class="login-box">
-    <div class="logo-ico">%</div>
-    <h1>Reforma Fácil</h1>
-    <p class="sub-t">CBS · IBS · Imposto Seletivo</p>
-    <div class="card">
-      <form id="form-login" autocomplete="on">
-        <div><label for="login-email">E-mail</label><input id="login-email" type="email" autocomplete="username" required></div>
-        <div><label for="login-senha">Senha</label><input id="login-senha" type="password" autocomplete="current-password" required></div>
-        <button class="btn" id="login-btn" type="submit">Entrar</button>
-      </form>
-      <a href="#" id="esqueci">Esqueci minha senha</a>
-      <div id="login-msg"></div>
-    </div>
-    <p class="dica" style="text-align:center">Acesso individual: cada conta funciona em um aparelho por vez.<br>Não tem acesso? Fale com o administrador.</p>
+<header>
+  <div class="wrap topo">
+    <a class="marca" href="#"><span class="ico">%</span>Reforma Fácil</a>
+    <nav class="menu">
+      <a href="#reforma">A reforma</a>
+      <a href="#vantagens">Vantagens</a>
+      <a href="#como">Como funciona</a>
+      <a href="#duvidas">Dúvidas</a>
+    </nav>
+    <span class="esp"></span>
+    <a class="btn sec peq" id="btn-entrar" href="app.html">Entrar</a>
+    <a class="btn pri peq" href="#acesso">Solicitar acesso</a>
   </div>
-</div>
-<div class="app">
-<aside class="lateral">
-  <div class="logo"><div class="logo-ico">%</div><div><b>Reforma Fácil</b><small>CBS · IBS · Imposto Seletivo</small></div></div>
-  <nav id="abas">
-    <button data-aba="calc" class="on"><svg viewBox="0 0 24 24"><rect x="4" y="2.5" width="16" height="19" rx="3"/><path d="M8 7h8M8 12h2M14 12h2M8 16h2M14 16h2"/></svg><span>Calcular</span></button>
-    <button data-aba="entenda"><svg viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5zM12 6.5v13"/></svg><span>Entenda</span></button>
-    <button data-aba="cons"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5 16 16"/></svg><span>Consultar</span></button>
-    <button data-aba="admin" class="so-admin"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M17 7.5h5M19.5 5v5"/></svg><span>Admin</span></button>
-    <button data-aba="sobre"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5v.5"/></svg><span>Conta</span></button>
-  </nav>
-  <div class="lateral-card conta-card" id="conta-card"></div>
-</aside>
+</header>
 
 <main>
-  <div class="topo-movel"><div class="logo-ico">%</div><b>Reforma Fácil</b></div>
-
-  <!-- ───────────── CALCULAR ───────────── -->
-  <section id="aba-calc" class="aba on">
-    <div class="titulo-feed" style="margin-top:0">Clientes</div>
-    <div class="barra-clientes" id="barra-clientes"></div>
-    <div class="card" id="cliente-info" style="padding:14px 18px"></div>
-    <div class="card">
-      <div class="post-cab"><div class="av">R$</div><div><b>Nova simulação</b><small>Escolha a data e as alíquotas; depois adicione os itens</small></div></div>
-      <div class="grade">
-        <div>
-          <label for="data">Data do fato gerador</label>
-          <input type="date" id="data" min="2026-01-01" max="2033-12-31">
-          <p class="dica">Define quais regras e alíquotas valem.</p>
-        </div>
-        <div>
-          <label for="uf">Estado (UF)</label>
-          <select id="uf"></select>
-          <p class="dica">Informativo: no momento as alíquotas são únicas para o país.</p>
-        </div>
+  <!-- HERO -->
+  <div class="wrap hero">
+    <div>
+      <span class="selo"><b>Novo</b> Atualizado com a tabela oficial de out/2026</span>
+      <h1>A Reforma Tributária <span class="grad-txt">sem complicação</span>.</h1>
+      <p class="lead">Calcule <b>CBS, IBS e Imposto Seletivo</b> em segundos, com as mesmas regras da calculadora oficial da Receita Federal,
+        e entenda cada número em linguagem simples.</p>
+      <div class="ctas">
+        <a class="btn pri" href="#acesso">Quero acesso</a>
+        <a class="btn sec" href="#demo">Testar agora, grátis</a>
       </div>
-      <div id="painel-aliq"></div>
+      <div class="provas"><span>Regras oficiais da Receita</span><span>Passo a passo explicado</span><span>Celular e computador</span></div>
     </div>
 
-    <div id="itens"></div>
-    <div class="linha nao-imprimir" style="margin-bottom:20px">
-      <button class="btn sec" id="add-item">+ Adicionar item</button>
-      <button class="btn sec" id="exemplo">Carregar exemplo</button>
-      <span class="esp"></span>
-      <button class="btn sec" id="limpar">Limpar tudo</button>
-    </div>
-
-    <div id="resultado"></div>
-  </section>
-
-  <!-- ───────────── ENTENDA ───────────── -->
-  <section id="aba-entenda" class="aba prosa">
-    <div class="card">
-      <h2>O que muda</h2>
-      <p>A Reforma Tributária do Consumo (Emenda Constitucional 132/2023 e Lei Complementar 214/2025) troca cinco tributos
-        (PIS, Cofins, IPI, ICMS e ISS) por três:</p>
-      <div class="resumo">
-        <div class="kpi cbs"><div class="r">CBS</div><div class="v" style="font-size:16px">Contribuição Social sobre Bens e Serviços</div><div class="s">Federal. Substitui PIS e Cofins.</div></div>
-        <div class="kpi ibs"><div class="r">IBS</div><div class="v" style="font-size:16px">Imposto sobre Bens e Serviços</div><div class="s">Estados (IBS UF) e municípios (IBS Mun). Substitui ICMS e ISS.</div></div>
-        <div class="kpi is"><div class="r">IS</div><div class="v" style="font-size:16px">Imposto Seletivo</div><div class="s">Federal, a partir de 2027. Incide sobre itens prejudiciais à saúde ou ao meio ambiente (ex.: cigarro, bebida alcoólica).</div></div>
+    <div class="demo" id="demo">
+      <h3>Experimente: quanto de imposto tem nisso?</h3>
+      <p class="sub">Simulação para 2026, ano de teste da reforma, com as alíquotas oficiais.</p>
+      <div class="g2">
+        <div><label for="d-tipo">O que está sendo vendido</label><select id="d-tipo"></select></div>
+        <div><label for="d-valor">Valor (R$)</label><input id="d-valor" inputmode="decimal" value="1.000,00"></div>
       </div>
-      <p>CBS e IBS formam o chamado <b>IVA dual</b>: incidem sobre o valor da operação, são cobrados "por fora" (destacados na nota, sem
-        entrar na própria base) e geram crédito para quem compra, de forma que o tributo é pago, ao final, só sobre o valor que cada etapa acrescentou.</p>
+      <div class="res">
+        <div class="kpi cbs"><div class="r">CBS (federal)</div><div class="v" id="d-cbs">—</div></div>
+        <div class="kpi ibs"><div class="r">IBS (estado + município)</div><div class="v" id="d-ibs">—</div></div>
+        <div class="kpi tot"><div class="r">Total de tributos</div><div class="v" id="d-tot">—</div></div>
+      </div>
+      <div class="explica" id="d-explica"></div>
+      <p class="rod">Na versão completa: vários itens, qualquer uma das 170 classificações, Imposto Seletivo, anos de 2027 em diante e clientes salvos na nuvem.</p>
     </div>
+  </div>
 
-    <div class="card">
-      <h2>Linha do tempo da transição</h2>
+  <!-- A REFORMA -->
+  <section id="reforma">
+    <div class="wrap">
+      <div class="tit"><div class="pre grad-txt">A reforma em 1 minuto</div>
+        <h2>Cinco tributos viram três</h2>
+        <p>A Emenda Constitucional 132/2023 e a Lei Complementar 214/2025 mudam a forma como o consumo é tributado no Brasil.</p></div>
+      <div class="antes">
+        <span class="x">PIS</span><span class="x">Cofins</span><span class="x">IPI</span><span class="x">ICMS</span><span class="x">ISS</span>
+        <span class="seta">→</span>
+        <span class="n" style="background:var(--cbs)">CBS</span><span class="n" style="background:var(--ibs)">IBS</span><span class="n" style="background:var(--is)">IS</span>
+      </div>
+      <div class="cards">
+        <div class="card trib cbs"><div class="sig" style="color:var(--cbs)">CBS</div><h3>Contribuição sobre Bens e Serviços</h3>
+          <p>Federal. Substitui PIS e Cofins. Cobrada de verdade a partir de 2027.</p></div>
+        <div class="card trib ibs"><div class="sig" style="color:var(--ibs)">IBS</div><h3>Imposto sobre Bens e Serviços</h3>
+          <p>De estados e municípios. Substitui ICMS e ISS aos poucos, entre 2029 e 2033.</p></div>
+        <div class="card trib is"><div class="sig" style="color:var(--is)">IS</div><h3>Imposto Seletivo</h3>
+          <p>Federal, a partir de 2027, sobre itens prejudiciais à saúde ou ao meio ambiente, como cigarros e bebidas alcoólicas.</p></div>
+      </div>
+      <div class="cards" style="margin-top:16px">
+        <div class="card"><div class="ic">🧾</div><h3>Imposto "por fora"</h3><p>CBS e IBS aparecem separados na nota, sem imposto sobre imposto. Fica claro quanto você paga.</p></div>
+        <div class="card"><div class="ic">🔁</div><h3>Crédito amplo</h3><p>Quem compra para a empresa recupera o tributo pago nas etapas anteriores. Cada etapa paga só sobre o valor que acrescentou.</p></div>
+        <div class="card"><div class="ic">🏷️</div><h3>Reduções por setor</h3><p>Cesta básica com alíquota zero; saúde, educação e medicamentos com 60% de redução, entre outros casos previstos na lei.</p></div>
+      </div>
+
+      <div class="tit" style="margin-top:54px"><h2 style="font-size:clamp(24px,3vw,32px)">A transição, ano a ano</h2></div>
       <div class="linha-tempo">
-        <div class="ano"><b>2026</b>Ano de teste: CBS 0,9% e IBS 0,1% destacados na nota (compensáveis com PIS/Cofins). É o que a calculadora usa por padrão em 2026.</div>
-        <div class="ano"><b>2027</b>CBS passa a valer de verdade e PIS/Cofins acabam. Começa o Imposto Seletivo. IBS segue em 0,1% (0,05% UF + 0,05% Mun).</div>
-        <div class="ano"><b>2029 a 2032</b>Transição do IBS: ICMS e ISS caem aos poucos enquanto o IBS sobe na mesma proporção.</div>
-        <div class="ano"><b>2033</b>Sistema novo completo: ICMS e ISS deixam de existir.</div>
+        <div class="ano agora"><b>2026 <span class="tag">agora</span></b><p>Ano de teste: CBS de 0,9% e IBS de 0,1% aparecem na nota, compensáveis com PIS/Cofins.</p></div>
+        <div class="ano"><b>2027</b><p>A CBS passa a valer e PIS/Cofins acabam. Começa o Imposto Seletivo.</p></div>
+        <div class="ano"><b>2029–2032</b><p>ICMS e ISS diminuem a cada ano enquanto o IBS aumenta na mesma proporção.</p></div>
+        <div class="ano"><b>2033</b><p>Sistema novo completo: ICMS e ISS deixam de existir.</p></div>
       </div>
-      <p class="dica">A partir de 2027 as alíquotas de referência ainda não estão na base oficial; por isso a calculadora pede que você as informe (o resultado é uma <i>simulação</i>).</p>
-    </div>
-
-    <div class="card">
-      <h2>Os códigos que você precisa conhecer</h2>
-      <h3>CST — Código de Situação Tributária</h3>
-      <p>Diz <b>qual é o tipo de tratamento</b> da operação. Exemplos: <code>000</code> tributação integral, <code>200</code> alíquota reduzida,
-        <code>410</code> imunidade/não incidência, <code>510</code> diferimento, <code>550</code> suspensão.</p>
-      <h3>cClassTrib — Código de Classificação Tributária</h3>
-      <p>Detalha o CST: <b>qual regra específica</b> da lei se aplica. Os 3 primeiros dígitos são o CST. Exemplo: <code>200003</code>
-        = produtos da Cesta Básica Nacional (redução de 100%), <code>200028</code> = serviços de educação (redução de 60%).
-        É a cClassTrib que define o percentual de redução, o tipo de alíquota e a fórmula do cálculo. Use a aba <i>Consultar classificações</i> para encontrar a sua.</p>
-      <h3>NCM e NBS</h3>
-      <p>Códigos do produto (NCM) e do serviço (NBS). Muitas cClassTrib só valem para certos NCM/NBS (ex.: só para itens do Anexo I).
-        Esta ferramenta mostra a exigência, mas não confere o vínculo NCM × cClassTrib: <b>confira na legislação ou na API oficial</b>.</p>
-    </div>
-
-    <div class="card">
-      <h2>Como o cálculo é feito</h2>
-      <ol class="explica">
-        <li><b>Base de cálculo</b> = valor da operação. Se há Imposto Seletivo, ele entra na base da CBS/IBS. O valor é arredondado a 2 casas.</li>
-        <li><b>Alíquota nominal</b> = alíquota do tributo (de referência, fixa, setorial ou informada).</li>
-        <li><b>Alíquota efetiva</b> = alíquota × (1 − redução). Ex.: 0,90% com redução de 60% → 0,36%. Arredondada a 4 casas.</li>
-        <li><b>Tributo</b> = base × alíquota efetiva, arredondado a 2 casas.</li>
-        <li>Se houver <b>diferimento</b>, parte (ou todo) o tributo é adiado para a etapa seguinte e não é pago agora.</li>
-        <li><b>Suspensão</b>: o tributo fica zerado, mas a nota informa quanto seria devido na "tributação regular".</li>
-        <li><b>Isenção / imunidade</b>: não há destaque de CBS/IBS.</li>
-      </ol>
-      <p>Os arredondamentos seguem a regra oficial (ABNT NBR 5891, "arredondamento bancário"): quando o dígito descartado é exatamente 5, arredonda-se para o par mais próximo.
-        Ex.: 0,125 → 0,12 e 0,135 → 0,14.</p>
     </div>
   </section>
 
-  <!-- ───────────── CONSULTAR ───────────── -->
-  <section id="aba-cons" class="aba">
-    <div class="card">
-      <h2>Classificações tributárias (cClassTrib) vigentes</h2>
-      <div class="grade">
-        <div><label for="c-busca">Buscar (código ou palavra)</label><input id="c-busca" placeholder="ex.: educação, cesta básica, 200028"></div>
-        <div><label for="c-cst">CST</label><select id="c-cst"></select></div>
-        <div><label for="c-data">Vigentes em</label><input type="date" id="c-data" min="2026-01-01"></div>
+  <!-- VANTAGENS -->
+  <section id="vantagens">
+    <div class="wrap">
+      <div class="tit"><div class="pre grad-txt">Por que o Reforma Fácil</div>
+        <h2>Precisão de quem segue a regra oficial. Clareza de quem explica.</h2></div>
+      <div class="cards">
+        <div class="card"><div class="ic">🏛️</div><h3>Regras da Receita Federal</h3><p>Usa as mesmas fórmulas, tabelas e arredondamentos da calculadora oficial publicada pela Receita, conferidos com os testes oficiais.</p></div>
+        <div class="card"><div class="ic">💬</div><h3>Explica cada número</h3><p>Mostra a alíquota, a redução, a base e a conta, em linguagem simples, e também com a fórmula oficial para quem quiser auditar.</p></div>
+        <div class="card"><div class="ic">🔎</div><h3>170 classificações na palma da mão</h3><p>Encontre a cClassTrib certa digitando "educação" ou "cesta básica", com o percentual de redução de cada uma.</p></div>
+        <div class="card"><div class="ic">👥</div><h3>Seus clientes organizados</h3><p>Uma aba para cada cliente, com a simulação salva na nuvem. Ideal para escritórios de contabilidade.</p></div>
+        <div class="card"><div class="ic">📱</div><h3>Em qualquer lugar</h3><p>Funciona no navegador do celular, do tablet e do computador. Não precisa instalar nada.</p></div>
+        <div class="card"><div class="ic">🔒</div><h3>Acesso individual e seguro</h3><p>Cada conta é pessoal e funciona em um aparelho por vez. Só você vê os seus clientes.</p></div>
       </div>
-      <p class="dica" id="c-conta"></p>
-      <div class="tabela-wrap"><table class="cons" id="c-tab"></table></div>
     </div>
   </section>
 
-  <!-- ───────────── SOBRE ───────────── -->
-  <section id="aba-admin" class="aba so-admin">
-    <div class="card">
-      <div class="post-cab"><div class="av">+</div><div><b>Nova conta</b><small>A pessoa recebe um e-mail para criar a própria senha</small></div></div>
-      <form id="form-novo-usuario" class="grade">
-        <div><label>Nome</label><input name="nome" required maxlength="120"></div>
-        <div><label>E-mail</label><input name="email" type="email" required></div>
-        <div><label>Acesso por</label><select name="dias"><option value="7">7 dias (teste)</option><option value="30" selected>30 dias</option><option value="90">90 dias</option><option value="365">1 ano</option></select></div>
-        <div style="align-self:end"><button class="btn" type="submit" style="width:100%">Criar conta</button></div>
-      </form>
-      <div id="admin-msg"></div>
-    </div>
-    <div class="card">
-      <div class="linha"><h2 style="margin:0">Contas</h2><span class="esp"></span><span class="dica" id="admin-conta" style="margin:0"></span></div>
-      <div id="admin-lista"></div>
+  <!-- COMO FUNCIONA -->
+  <section id="como">
+    <div class="wrap">
+      <div class="tit"><div class="pre grad-txt">Como funciona</div><h2>Do produto ao imposto em três passos</h2></div>
+      <div class="passos">
+        <div class="card passo"><h3>Escolha o cliente e a data</h3><p>A data define as regras e alíquotas que valem: 2026 é o ano de teste; de 2027 em diante, você simula.</p></div>
+        <div class="card passo"><h3>Adicione os itens</h3><p>Escolha a classificação de cada produto ou serviço e digite o valor. Há busca por palavra.</p></div>
+        <div class="card passo"><h3>Veja e entenda</h3><p>CBS, IBS e IS por item e no total, a carga sobre a venda e o passo a passo de cada conta. Imprima ou exporte.</p></div>
+      </div>
+      <div class="tit" style="margin:44px auto 18px"><h2 style="font-size:clamp(22px,2.6vw,28px)">Feito para</h2></div>
+      <div class="publico"><span>🧮 Contadores e escritórios</span><span>🏪 Empresários e lojistas</span><span>💼 Consultores tributários</span><span>📚 Estudantes e professores</span><span>🧾 Equipes fiscais</span></div>
     </div>
   </section>
 
-  <section id="aba-sobre" class="aba prosa">
-    <div class="card conta-movel"><div class="conta-card"></div></div>
-    <div class="card">
-      <h2>Sobre esta ferramenta</h2>
-      <p>Programa feito a partir do código-fonte da <b>calculadora-rtc-regime-regular</b> publicada pela Receita Federal/Serpro.
-        As tabelas (CST, cClassTrib, percentuais de redução, alíquotas e fórmulas) vêm do banco de dados oficial que acompanha o projeto,
-        e o motor de cálculo reproduz as mesmas fórmulas e regras de arredondamento.</p>
-      <p id="sobre-versao"></p>
-      <h3>O que esta ferramenta faz</h3>
-      <ul>
-        <li>Calcula CBS, IBS estadual, IBS municipal e Imposto Seletivo, item a item e no total.</li>
-        <li>Mostra o passo a passo de cada conta, com a fórmula oficial.</li>
-        <li>Trata redução de alíquota, alíquota fixa e setorial, diferimento, suspensão (com tributação regular), isenção e imunidade.</li>
-        <li>Gera o JSON de entrada para a API oficial, se você quiser conferir o resultado nela.</li>
-      </ul>
-      <h3>Limites (o que não faz)</h3>
-      <ul>
-        <li>Não confere o vínculo entre NCM/NBS e a cClassTrib, nem o tipo de documento fiscal.</li>
-        <li>Não calcula compras governamentais, monofasia de combustíveis, transferência de crédito e ajustes (CST 620, 800, 810, 811 e 820). Parte disso também ainda não está liberada na calculadora oficial.</li>
-        <li>Não é consultoria tributária: o resultado é uma estimativa para entender as regras. Confirme antes de emitir documentos.</li>
-      </ul>
-      <p>Os dados ficam só no seu computador (o programa funciona sem internet).</p>
+  <!-- DÚVIDAS -->
+  <section id="duvidas">
+    <div class="wrap">
+      <div class="tit"><div class="pre grad-txt">Dúvidas frequentes</div><h2>Perguntas comuns</h2></div>
+      <div class="faq">
+        <details><summary>É a calculadora oficial da Receita Federal?</summary>
+          <p>Não. O Reforma Fácil é independente, mas usa as tabelas e as regras de cálculo da calculadora que a Receita publicou como código aberto. O resultado serve para simular e entender, sem valor fiscal: confira antes de emitir documentos.</p></details>
+        <details><summary>Preciso instalar alguma coisa?</summary>
+          <p>Não. Basta abrir o site no navegador do celular ou do computador e entrar com a sua conta. Se quiser, dá para adicionar à tela de início do celular como um app.</p></details>
+        <details><summary>Por que não posso usar a mesma conta em dois aparelhos ao mesmo tempo?</summary>
+          <p>Cada conta é individual. Se você entrar em outro aparelho, o anterior é desconectado automaticamente, e é só entrar de novo quando quiser voltar a ele.</p></details>
+        <details><summary>Meus dados e os dos meus clientes ficam seguros?</summary>
+          <p>Sim. As simulações e os clientes ficam no Google Firebase, em servidores em São Paulo, e as regras de segurança garantem que só você os acessa. Nem o administrador do sistema vê as suas simulações.</p></details>
+        <details><summary>Quais situações ele calcula?</summary>
+          <p>Tributação integral, alíquotas reduzidas, alíquota fixa e setorial, diferimento, suspensão, isenção, imunidade e Imposto Seletivo. Compras governamentais, combustíveis (monofasia) e ajustes ainda não são calculados, assim como ainda não são na calculadora oficial.</p></details>
+        <details><summary>E as alíquotas de 2027 em diante?</summary>
+          <p>Ainda não foram fixadas oficialmente. A partir de 2027 você informa as alíquotas que quer simular, e o resultado aparece marcado como simulação.</p></details>
+      </div>
     </div>
   </section>
-  <footer>Baseado na calculadora oficial da Receita Federal · uso educativo, sem valor fiscal</footer>
+
+  <!-- ACESSO -->
+  <section id="acesso">
+    <div class="wrap">
+      <div class="acesso">
+        <div>
+          <div class="pre grad-txt" style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">Solicitar acesso</div>
+          <h2>Comece a usar o Reforma Fácil</h2>
+          <p style="color:var(--muted);margin:0">Deixe seus dados e entraremos em contato com as opções de plano. Você recebe por e-mail o link para criar a sua senha.</p>
+          <ul><li>Cálculos ilimitados</li><li>Clientes ilimitados salvos na nuvem</li><li>Atualizações da tabela oficial incluídas</li></ul>
+        </div>
+        <form id="form-acesso">
+          <div><label for="a-nome">Nome</label><input id="a-nome" name="nome" required maxlength="120" autocomplete="name"></div>
+          <div><label for="a-email">E-mail</label><input id="a-email" name="email" type="email" required maxlength="160" autocomplete="email"></div>
+          <div><label for="a-tel">WhatsApp (opcional)</label><input id="a-tel" name="telefone" inputmode="tel" maxlength="30" autocomplete="tel"></div>
+          <div><label for="a-perfil">Você é</label>
+            <select id="a-perfil" name="perfil"><option>Contador / escritório</option><option>Empresário</option><option>Consultor</option><option>Estudante / professor</option><option>Outro</option></select></div>
+          <div><label for="a-msg">Mensagem (opcional)</label><textarea id="a-msg" name="mensagem" rows="3" maxlength="1000"></textarea></div>
+          <input name="site" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
+          <button class="btn pri" type="submit">Quero acesso</button>
+          <div id="a-retorno"></div>
+          <p style="font-size:12.5px;color:var(--muted);margin:0">Usamos seus dados só para responder a este pedido.</p>
+        </form>
+      </div>
+    </div>
+  </section>
 </main>
-</div>
+
+<footer>
+  <div class="wrap">
+    <p><b>Reforma Fácil</b> · <a href="app.html">Entrar</a> · <a href="#acesso">Solicitar acesso</a></p>
+    <p>Tabelas e regras de cálculo baseadas na calculadora-rtc-regime-regular, © Receita Federal do Brasil, licença MIT.</p>
+    <p>Ferramenta independente para simulação e estudo, sem vínculo com a Receita Federal e sem valor fiscal.</p>
+  </div>
+</footer>
 
 <script src="dados.js"></script>
 <script src="motor.js"></script>
 <script src="firebase-config.js"></script>
-<script src="app.js"></script>
-<script src="conta.js"></script>
-<script type="module" src="nuvem.js"></script>
+<script src="inicio.js"></script>
 <script>
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
     window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));

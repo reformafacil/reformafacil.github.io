@@ -185,7 +185,44 @@
   // ───────── painel do administrador ─────────
   const emDias = (n) => { const d = new Date(); d.setDate(d.getDate() + n); d.setHours(23, 59, 59, 0); return d; };
   const paraInput = (ts) => { const d = ts && ts.toDate ? ts.toDate() : null; return d ? [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-') : ''; };
+  async function renderPedidos() {
+    const el = $('#pedidos-lista');
+    try {
+      const ps = await Nuvem.listarSolicitacoes();
+      $('#pedidos-conta').textContent = ps.length ? ps.length + ' pendente(s)' : '';
+      const aba = document.querySelector('#abas button[data-aba="admin"] span');
+      if (aba) aba.textContent = ps.length ? 'Admin (' + ps.length + ')' : 'Admin';
+      el.innerHTML = ps.map((p) => `<div class="usuario" data-pedido="${p.id}">
+          <div class="post-cab" style="margin:0"><div class="av">${esc(inicial(p.nome))}</div>
+            <div style="min-width:0"><b>${esc(p.nome)}</b><small>${esc(p.email)}${p.telefone ? ' · ' + esc(p.telefone) : ''}</small></div>
+            <span class="esp"></span><span class="tag">${esc(p.perfil || '')}</span></div>
+          ${p.mensagem ? `<p style="margin:10px 0 0;white-space:pre-line">${esc(p.mensagem)}</p>` : ''}
+          <div class="linha" style="margin-top:10px"><span class="dica" style="margin:0">${fmtData(p.criadoEm)}</span><span class="esp"></span>
+            ${p.telefone ? `<a class="btn peq" target="_blank" rel="noopener" href="https://wa.me/55${esc(p.telefone.replace(/\D/g, '').replace(/^55(?=\d{10,11}$)/, ''))}">WhatsApp</a>` : ''}
+            <a class="btn peq" href="mailto:${encodeURIComponent(p.email)}?subject=${encodeURIComponent('Acesso ao Reforma Fácil')}">E-mail</a>
+            <button class="btn peq" data-pacao="criar">Criar conta</button>
+            <button class="btn del" data-pacao="remover">Remover</button></div></div>`).join('')
+        || '<p class="dica">Nenhum pedido no momento.</p>';
+      el._pedidos = ps;
+    } catch (e) { el.innerHTML = `<div class="erro">${esc(Nuvem.erroAmigavel(e))}</div>`; }
+  }
+  $('#pedidos-lista').addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-pacao]'); if (!b) return;
+    const id = b.closest('[data-pedido]').dataset.pedido;
+    const p = $('#pedidos-lista')._pedidos.find((x) => x.id === id);
+    if (b.dataset.pacao === 'criar') {
+      const f = $('#form-novo-usuario'); f.nome.value = p.nome; f.email.value = p.email;
+      f.scrollIntoView({ behavior: 'smooth', block: 'center' }); f.dias.focus();
+      $('#admin-msg').innerHTML = '<div class="info">Dados do pedido preenchidos. Escolha o período e clique em "Criar conta"; depois remova o pedido.</div>';
+    }
+    if (b.dataset.pacao === 'remover') {
+      if (!confirm('Remover o pedido de ' + p.nome + '?')) return;
+      try { await Nuvem.excluirSolicitacao(id); renderPedidos(); } catch (err) { alert(Nuvem.erroAmigavel(err)); }
+    }
+  });
+
   async function renderAdmin() {
+    renderPedidos();
     const el = $('#admin-lista');
     el.innerHTML = '<p class="dica">Carregando…</p>';
     try {
@@ -257,6 +294,7 @@
           document.body.classList.remove('deslogado', 'carregando');
           document.body.classList.toggle('admin', !!c.admin);
           renderConta();
+          if (c.admin) renderPedidos();
           try { await carregarClientes(); } catch (e) { status('Erro ao carregar clientes: ' + Nuvem.erroAmigavel(e), 'erro'); }
         },
         saiu: (motivo) => {

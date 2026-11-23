@@ -188,6 +188,11 @@ const Nuvem = {
   },
   derrubarSessao: (uid) => fb.updateDoc(fb.doc(db, 'usuarios', uid), { sessao: { id: 'revogada-' + novoId(), aparelho: 'revogada pelo administrador', em: fb.serverTimestamp() } }),
   reenviarSenha: (email) => fb.sendPasswordResetEmail(auth, email),
+  async listarSolicitacoes() {
+    const s = await fb.getDocs(fb.query(fb.collection(db, 'solicitacoes'), fb.orderBy('criadoEm', 'desc')));
+    return s.docs.map((d) => ({ id: d.id, ...d.data() }));
+  },
+  excluirSolicitacao: (id) => fb.deleteDoc(fb.doc(db, 'solicitacoes', id)),
 };
 
 window.Nuvem = Nuvem;
