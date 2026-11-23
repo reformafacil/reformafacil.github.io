@@ -26,11 +26,11 @@ const REGIAO = 'southamerica-east1';
 setGlobalOptions({ region: REGIAO, maxInstances: 5 });
 
 const HANDLE = defineString('INFINITEPAY_HANDLE');          // InfiniteTag, sem o "$"
-const SITE = defineString('SITE_URL', { default: 'https://joaovcbarcelos.github.io/reforma-facil/' });
+const SITE = defineString('SITE_URL', { default: 'https://reformafacil.github.io/' });
 const TOKEN = defineSecret('WEBHOOK_TOKEN');                // segredo na URL do webhook (o aviso não é assinado)
 
 const API = 'https://api.checkout.infinitepay.io';
-const ORIGENS = ['https://joaovcbarcelos.github.io', /^http:\/\/localhost(:\d+)?$/];
+const ORIGENS = ['https://reformafacil.github.io', /^http:\/\/localhost(:\d+)?$/];
 
 const iguais = (a, b) => {
   const x = Buffer.from(String(a)), y = Buffer.from(String(b));
