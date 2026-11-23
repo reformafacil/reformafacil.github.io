@@ -10,7 +10,7 @@ Tempo estimado: 15 minutos.
 ## 2. Ativar o login por e-mail e senha
 1. Menu **Criação → Authentication → Vamos começar**.
 2. Aba **Método de login → E-mail/senha → Ativar → Salvar**.
-3. Aba **Configurações → Domínios autorizados → Adicionar domínio**: `joaovcbarcelos.github.io`.
+3. Aba **Configurações → Domínios autorizados → Adicionar domínio**: `reformafacil.github.io`.
 4. (Opcional) Aba **Modelos** → ícone de idioma → **Português (Brasil)**, para os e-mails de senha saírem em português.
 
 ## 3. Criar o banco de dados

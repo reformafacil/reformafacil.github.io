@@ -1,6 +1,6 @@
 # Calculadora da Reforma Tributária (CBS · IBS · IS)
 
-Site: <https://joaovcbarcelos.github.io/reforma-facil/>
+Site: <https://reformafacil.github.io/>
 
 - `index.html`: página inicial (apresentação, demonstração grátis e pedido de acesso)
 - `app.html`: a calculadora, com login
