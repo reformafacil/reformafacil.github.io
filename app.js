@@ -285,14 +285,14 @@
     const b = $('#btn-json', el);
     if (b) b.addEventListener('click', () => copiarJson(op, b));
     const p = $('#btn-print', el);
-    if (p) p.addEventListener('click', () => window.print());
+    if (p) p.addEventListener('click', () => (window.Relatorio ? window.Relatorio.abrir() : window.print()));
   }
 
   function renderResultado(r, op) {
     const t = r.total;
     const carga = t.vBC.isZero() ? null : t.vTotal.mul(RTC.dec(100)).div(t.vBC);
     let h = `<div class="card"><div class="linha"><div class="post-cab" style="margin:0"><div class="av">=</div><div><b>Resultado</b><small>Fato gerador em ${RTC.fmtData(op.data)}${est.uf ? ' · ' + est.uf : ''} · atualiza enquanto você digita</small></div></div><span class="esp"></span>
-      <button class="btn sec peq nao-imprimir" id="btn-print">Imprimir</button>
+      <button class="btn sec peq nao-imprimir" id="btn-print">Relatório PDF</button>
       <button class="btn sec peq nao-imprimir" id="btn-json">Copiar JSON da API</button></div>
       <div class="resumo" style="margin-top:10px">
         <div class="kpi"><div class="r">Base de cálculo</div><div class="v">${brl(t.vBC)}</div><div class="s">soma dos itens com CBS/IBS</div></div>
@@ -484,6 +484,13 @@
     },
     operacaoAtual: () => est,
     notificar: () => salvar(),
+    // cálculo do cliente atual, para o relatório
+    calcularAtual() {
+      const op = montarOperacao();
+      if (op.itens.some((i) => [i.baseCalculo, i.quantidade].includes('x'))) return { op, erro: 'Há um número inválido nos itens.' };
+      op.itens.forEach((i) => { if (i.aliquotas) Object.keys(i.aliquotas).forEach((k) => { i.aliquotas[k] = limpa(i.aliquotas[k]); }); });
+      try { return { op, r: RTC.calcularOperacao(base, op), uf: est.uf }; } catch (e) { return { op, erro: e.message }; }
+    },
   };
   renderTudo();
   window.dispatchEvent(new Event('app-pronto'));

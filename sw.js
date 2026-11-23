@@ -1,8 +1,8 @@
 /* Service worker: guarda o app no aparelho para funcionar sem internet. */
-const VERSAO = 'reforma-facil-v6';
+const VERSAO = 'reforma-facil-v7';
 const ARQUIVOS = [
   './', './index.html', './app.html', './inicio.js', './app.js', './motor.js', './dados.js', './manifest.webmanifest',
-  './conta.js', './dialogo.js', './comparador.js', './comparador-modelo.js', './nuvem.js', './firebase-config.js',
+  './conta.js', './dialogo.js', './relatorio.js', './comparador.js', './comparador-modelo.js', './nuvem.js', './firebase-config.js',
   './icones/icone-192.png', './icones/icone-512.png', './icones/icone-maskable-512.png',
   './icones/apple-touch-icon.png', './icones/favicon-32.png',
 ];

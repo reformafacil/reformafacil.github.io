@@ -20,6 +20,8 @@
       if (c) Object.assign(c, dados); this.gravar(l);
     },
     async excluirCliente(id) { this.gravar(this.ler().filter((x) => x.id !== id)); },
+    async lerMarca() { try { return JSON.parse(localStorage.getItem('rtc-marca')); } catch (e) { return null; } },
+    async salvarMarca(m) { localStorage.setItem('rtc-marca', JSON.stringify({ nome: m.nome || '', contato: m.contato || '', logo: m.logo || '' })); },
   };
   let store = Local;
 
@@ -66,6 +68,7 @@
     $('#cliente-info').innerHTML = c ? `<div class="linha"><div><b style="font-size:16px">${esc(c.nome)}</b>
         ${c.documento ? `<small class="dica" style="display:block;margin:0">${esc(c.documento)}</small>` : ''}</div><span class="esp"></span>
         <span id="salvo" class="salvo"></span>
+        <button class="btn peq" id="pdf-cliente">Relatório PDF</button>
         <button class="btn peq" id="ren-cliente">Editar</button>
         <button class="btn del" id="del-cliente">Excluir</button></div>` : '';
   }
@@ -93,6 +96,7 @@
     const b = e.target.closest('[data-cli]');
     if (b) return abrirCliente(b.dataset.cli);
     if (e.target.closest('#novo-cliente')) return novoCliente();
+    if (e.target.closest('#pdf-cliente')) { await gravarAgora(); return window.Relatorio && window.Relatorio.abrir(); }
     if (e.target.closest('#ren-cliente')) {
       const c = clientes.find((x) => x.id === ativo);
       const v = await Dialogo.form({ titulo: 'Editar cliente', campos: [
@@ -287,6 +291,15 @@
     b.disabled = false; b.textContent = 'Criar conta';
   });
   $('#abas').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b && b.dataset.aba === 'admin') renderAdmin(); });
+
+  // dados para o relatório
+  window.Conta = {
+    clienteAtivo: () => clientes.find((x) => x.id === ativo) || null,
+    usuario: () => conta,
+    lerMarca: () => store.lerMarca(),
+    salvarMarca: (m) => store.salvarMarca(m),
+    erro: (e) => (window.Nuvem ? Nuvem.erroAmigavel(e) : e.message),
+  };
 
   // ───────── início ─────────
   async function iniciarNuvem() {

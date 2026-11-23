@@ -6,6 +6,7 @@ rules_version = '2';
 //   admins/{uid}                         existe = é administrador (criado à mão no Console)
 //   usuarios/{uid}                       { nome, email, ativo, validade, sessao: { id, aparelho, em } }
 //   usuarios/{uid}/clientes/{clienteId}  { nome, documento, operacao, sessao, atualizadoEm }
+//   usuarios/{uid}/config/marca          { nome, contato, logo } do escritório, para o relatório
 //   solicitacoes/{id}                    pedidos de acesso da página inicial
 service cloud.firestore {
   match /databases/{db}/documents {
@@ -34,6 +35,17 @@ service cloud.firestore {
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['sessao'])
             && request.resource.data.sessao.id is string
             && request.resource.data.sessao.id.size() >= 16);
+
+      // marca do escritório usada no relatório em PDF (logo em imagem reduzida, até ~300 KB)
+      match /config/{doc} {
+        allow read: if eu(uid) && acessoValido(uid);
+        allow write: if eu(uid) && acessoValido(uid) && doc == 'marca'
+          && request.resource.data.keys().hasOnly(['nome', 'contato', 'logo', 'atualizadoEm'])
+          && request.resource.data.nome is string && request.resource.data.nome.size() <= 120
+          && request.resource.data.contato is string && request.resource.data.contato.size() <= 200
+          && request.resource.data.logo is string && request.resource.data.logo.size() <= 300000
+          && (request.resource.data.logo == '' || request.resource.data.logo.matches('^data:image/(png|jpeg);base64,.*'));
+      }
 
       match /clientes/{clienteId} {
         allow read, delete: if eu(uid) && acessoValido(uid);

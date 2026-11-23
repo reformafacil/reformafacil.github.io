@@ -20,6 +20,7 @@ Configuração e funcionamento: [CONFIGURAR-FIREBASE.md](CONFIGURAR-FIREBASE.md)
 ## Arquivos
 - `index.html` + `inicio.js`: página inicial
 - `comparador-modelo.js` + `comparador.js`: aba Comparar (antes × depois da reforma, 2026–2033)
+- `relatorio.js`: relatório em PDF (A4) com a marca do escritório
 - `dialogo.js`: janelas do app (no lugar de prompt/confirm, que alguns navegadores bloqueiam)
 - `app.html`, `app.js`, `conta.js`, `nuvem.js`: a calculadora, o login e o painel do administrador
 - `motor.js`: motor de cálculo (mesmas fórmulas e arredondamentos da calculadora da Receita)

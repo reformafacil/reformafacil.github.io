@@ -67,14 +67,20 @@
       <p class="dica">CBS 8,8% + IBS 17,7% (26,5% no total) é a estimativa mais citada pelo governo. As alíquotas de referência ainda serão fixadas oficialmente: ajuste para simular outros cenários.</p>`;
   }
 
-  function renderResultado() {
-    const c = cfg();
-    const o = opcoesCls.find((x) => x.cd === c.cls) || { rc: 0, ri: 0 };
+  // entradas do comparador do cliente atual (para a tela e para o relatório)
+  function entradas(c) {
+    const o = opcoesCls.find((x) => x.cd === c.cls) || { cd: c.cls, desc: '', rc: 0, ri: 0 };
     const e = { preco: num(c.preco), tipo: c.tipo, icms: num(c.icms), iss: num(c.iss), ipi: num(c.ipi), pisCofins: num(c.pisCofins),
       cbs: num(c.cbs), ibs: num(c.ibs), redCbs: o.rc, redIbs: o.ri, is: num(c.is) || 0 };
-    const el = $('#cmp-resultado');
     const campos = c.tipo === 'servico' ? ['preco', 'iss', 'pisCofins', 'cbs', 'ibs'] : ['preco', 'icms', 'ipi', 'pisCofins', 'cbs', 'ibs'];
-    if (campos.some((k) => !isFinite(e[k]) || e[k] < 0) || !(e.preco > 0)) { el.innerHTML = '<div class="aviso">Preencha os valores com números (ex.: 1.000,00 e 18).</div>'; return; }
+    const valido = !campos.some((k) => !isFinite(e[k]) || e[k] < 0) && e.preco > 0;
+    return { c, o, e, valido };
+  }
+
+  function renderResultado() {
+    const { c, o, e, valido } = entradas(cfg());
+    const el = $('#cmp-resultado');
+    if (!valido) { el.innerHTML = '<div class="aviso">Preencha os valores com números (ex.: 1.000,00 e 18).</div>'; return; }
     let r;
     try { r = Comparador.calcular(e); } catch (err) { el.innerHTML = `<div class="erro">${esc(err.message)}</div>`; return; }
     const h = r.hoje, fim = r.anos[r.anos.length - 1];
@@ -198,6 +204,18 @@
   });
 
   function render() { renderForm(); renderResultado(); }
+
+  window.ComparadorUI = {
+    grafico,
+    // null quando o cliente nunca usou o comparador ou os dados estão incompletos
+    atual() {
+      const op = window.App.operacaoAtual();
+      if (!op.comparador) return null;
+      const x = entradas(op.comparador);
+      if (!x.valido) return null;
+      try { return { ...x, r: Comparador.calcular(x.e) }; } catch (err) { return null; }
+    },
+  };
   window.addEventListener('operacao-aberta', () => { if (raiz.classList.contains('on')) render(); });
   $('#abas').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b && b.dataset.aba === 'comparar') render(); });
 })();

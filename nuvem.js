@@ -157,6 +157,14 @@ const Nuvem = {
   },
   excluirCliente: (id) => fb.deleteDoc(fb.doc(db, 'usuarios', usuario.uid, 'clientes', id)),
 
+  // ── marca do escritório (para o relatório) ──
+  async lerMarca() {
+    const s = await fb.getDoc(fb.doc(db, 'usuarios', usuario.uid, 'config', 'marca'));
+    return s.exists() ? s.data() : null;
+  },
+  salvarMarca: (m) => fb.setDoc(fb.doc(db, 'usuarios', usuario.uid, 'config', 'marca'),
+    { nome: m.nome || '', contato: m.contato || '', logo: m.logo || '', atualizadoEm: fb.serverTimestamp() }),
+
   // ── administrador ──
   async listarUsuarios() {
     const s = await fb.getDocs(fb.query(fb.collection(db, 'usuarios'), fb.orderBy('email')));
