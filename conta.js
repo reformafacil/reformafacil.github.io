@@ -148,10 +148,19 @@
     el.innerHTML = `<div class="post-cab" style="margin-bottom:10px"><div class="av">${esc(inicial(p.nome || conta.email))}</div>
       <div style="min-width:0"><b style="overflow:hidden;text-overflow:ellipsis">${esc(p.nome || conta.email)}</b><small>${esc(conta.email)}</small></div></div>
       <div class="dica" style="margin:0 0 10px">Acesso até <b>${fmtData(p.validade)}</b>${conta.admin ? ' · administrador' : ''}<br>Sessão neste aparelho: ${esc(p.sessao ? p.sessao.aparelho : '')}</div>
-      <div class="linha"><button class="btn peq" id="trocar-senha">Trocar senha</button><button class="btn peq" id="sair">Sair</button></div>`;
+      <div class="linha"><button class="btn peq" id="trocar-senha">Trocar senha</button><button class="btn peq" id="sair">Sair</button></div>
+      <button class="btn" id="sugestao" style="width:100%;margin-top:10px">💬 Enviar sugestão ou problema</button>`;
   }
   document.addEventListener('click', async (e) => {
     if (e.target.closest('#sair')) { await gravarAgora(); Nuvem.sair(); }
+    if (e.target.closest('#sugestao')) {
+      const v = await Dialogo.form({ titulo: 'Enviar sugestão ou problema', ok: 'Enviar',
+        texto: 'Conte o que achou, o que faltou ou o que deu errado. Se for um erro, diga em qual tela e o que estava fazendo.',
+        campos: [{ nome: 'mensagem', label: 'Sua mensagem', tipo: 'textarea', obrigatorio: true, max: 1000 }] });
+      if (!v) return;
+      try { await Nuvem.enviarSugestao(v.mensagem); Dialogo.aviso('Obrigado! Sua mensagem foi enviada.', { titulo: 'Enviado' }); }
+      catch (err) { Dialogo.aviso('Não foi possível enviar: ' + Nuvem.erroAmigavel(err)); }
+    }
     if (e.target.closest('#trocar-senha')) {
       const v = await Dialogo.form({ titulo: 'Trocar senha', ok: 'Trocar', campos: [
         { nome: 'atual', label: 'Senha atual', tipo: 'password', obrigatorio: true },

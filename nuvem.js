@@ -201,6 +201,11 @@ const Nuvem = {
     return s.docs.map((d) => ({ id: d.id, ...d.data() }));
   },
   excluirSolicitacao: (id) => fb.deleteDoc(fb.doc(db, 'solicitacoes', id)),
+  // sugestões e problemas relatados de dentro do app (aparecem no painel Admin)
+  enviarSugestao: (mensagem) => fb.addDoc(fb.collection(db, 'solicitacoes'), {
+    nome: ((perfil && perfil.nome) || usuario.email).slice(0, 120), email: String(usuario.email).toLowerCase().slice(0, 160),
+    telefone: '', perfil: 'Sugestão do app (beta)', mensagem: String(mensagem).slice(0, 1000), criadoEm: fb.serverTimestamp(),
+  }),
 };
 
 window.Nuvem = Nuvem;

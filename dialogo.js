@@ -59,9 +59,12 @@
       const html = `<form method="dialog" novalidate>
         <h3>${esc(titulo)}</h3>${texto ? `<p>${esc(texto)}</p>` : ''}
         ${campos.map((c, i) => `<div><label for="dlg-c${i}">${esc(c.label)}</label>
-          <input id="dlg-c${i}" name="${esc(c.nome)}" type="${c.tipo || 'text'}" value="${esc(c.valor || '')}"
+          ${c.tipo === 'textarea'
+            ? `<textarea id="dlg-c${i}" name="${esc(c.nome)}" rows="${c.linhas || 5}" ${c.max ? `maxlength="${c.max}"` : ''}
+                style="width:100%;padding:11px 14px;border-radius:14px;border:1.5px solid transparent;background:var(--soft);color:var(--ink);font:inherit;resize:vertical">${esc(c.valor || '')}</textarea>`
+            : `<input id="dlg-c${i}" name="${esc(c.nome)}" type="${c.tipo || 'text'}" value="${esc(c.valor || '')}"
             ${c.tipo === 'password' ? 'autocomplete="' + (c.nome === 'atual' ? 'current-password' : 'new-password') + '"' : 'autocomplete="off"'}
-            ${c.max ? `maxlength="${c.max}"` : ''}></div>`).join('')}
+            ${c.max ? `maxlength="${c.max}"` : ''}>`}</div>`).join('')}
         <div class="dlg-erro"></div>
         <div class="acoes"><button type="button" class="btn peq" data-cancelar>Cancelar</button>
           <button type="submit" class="btn${perigo ? ' perigo' : ''}">${esc(ok)}</button></div></form>`;

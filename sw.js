@@ -1,5 +1,5 @@
 /* Service worker: guarda o app no aparelho para funcionar sem internet. */
-const VERSAO = 'reforma-facil-v7';
+const VERSAO = 'reforma-facil-v8';
 const ARQUIVOS = [
   './', './index.html', './app.html', './inicio.js', './app.js', './motor.js', './dados.js', './manifest.webmanifest',
   './conta.js', './dialogo.js', './relatorio.js', './comparador.js', './comparador-modelo.js', './nuvem.js', './firebase-config.js',
