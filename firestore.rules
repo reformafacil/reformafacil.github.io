@@ -8,6 +8,8 @@ rules_version = '2';
 //   usuarios/{uid}/clientes/{clienteId}  { nome, documento, operacao, sessao, atualizadoEm }
 //   usuarios/{uid}/config/marca          { nome, contato, logo } do escritório, para o relatório
 //   solicitacoes/{id}                    pedidos de acesso da página inicial
+//   pagamentos/{pedido}                  links e pagamentos da InfinitePay (só o servidor grava)
+//   estornos/{id}                        cancelamentos dentro dos 7 dias
 service cloud.firestore {
   match /databases/{db}/documents {
 
@@ -69,6 +71,20 @@ service cloud.firestore {
         && request.resource.data.mensagem is string && request.resource.data.mensagem.size() <= 1000
         && request.resource.data.criadoEm == request.time;
       allow read, delete: if admin();
+    }
+
+    // pagamentos: gravados só pelo servidor (Functions); o administrador consulta
+    match /pagamentos/{id} {
+      allow read: if admin();
+      allow write: if false;
+    }
+
+    // pedidos de estorno (garantia de 7 dias): criados pelo servidor; o administrador marca como feito
+    match /estornos/{id} {
+      allow read: if admin();
+      allow update: if admin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'feitoEm'])
+        && request.resource.data.status in ['pendente', 'feito'];
+      allow create, delete: if false;
     }
 
     // todo o resto é negado

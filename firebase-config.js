@@ -11,3 +11,6 @@ window.FIREBASE_CONFIG = {
   messagingSenderId: '746294128527',
   appId: '1:746294128527:web:4340322c496cf2e12825fa',
 };
+
+// endereço do servidor de pagamentos (Firebase Functions, região São Paulo)
+window.FUNCOES_URL = 'https://southamerica-east1-reforma-facil-60df7.cloudfunctions.net';

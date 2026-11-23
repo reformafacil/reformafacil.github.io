@@ -103,8 +103,8 @@ async function aoMudarUsuario(u) {
       if (!usuario) return;
       const d = s.data();
       if (!d) return encerrar('sem-acesso');
-      if (!d.sessao || d.sessao.id !== sessaoId) return encerrar('derrubado');
       if (!acessoValido(d)) return encerrar(d.ativo === false ? 'desativado' : 'expirado');
+      if (!d.sessao || d.sessao.id !== sessaoId) return encerrar('derrubado');
       perfil = d;
       ouvintes.perfil && ouvintes.perfil(d);
     }, () => {});
@@ -156,6 +156,18 @@ const Nuvem = {
       { ...dados, sessao: sessaoId, atualizadoEm: fb.serverTimestamp() }, { merge: true });
   },
   excluirCliente: (id) => fb.deleteDoc(fb.doc(db, 'usuarios', usuario.uid, 'clientes', id)),
+
+  // ── assinatura ──
+  async pedirEstorno() {
+    const F = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-functions.js`);
+    const fn = F.httpsCallable(F.getFunctions(app, 'southamerica-east1'), 'pedirEstorno');
+    return (await fn({})).data;
+  },
+  async listarEstornos() {
+    const s = await fb.getDocs(fb.query(fb.collection(db, 'estornos'), fb.where('status', '==', 'pendente')));
+    return s.docs.map((d) => ({ id: d.id, ...d.data() }));
+  },
+  marcarEstornoFeito: (id) => fb.updateDoc(fb.doc(db, 'estornos', id), { status: 'feito', feitoEm: fb.serverTimestamp() }),
 
   // ── marca do escritório (para o relatório) ──
   async lerMarca() {

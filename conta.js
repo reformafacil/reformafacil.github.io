@@ -147,11 +147,25 @@
     const p = conta.perfil || {};
     el.innerHTML = `<div class="post-cab" style="margin-bottom:10px"><div class="av">${esc(inicial(p.nome || conta.email))}</div>
       <div style="min-width:0"><b style="overflow:hidden;text-overflow:ellipsis">${esc(p.nome || conta.email)}</b><small>${esc(conta.email)}</small></div></div>
-      <div class="dica" style="margin:0 0 10px">Acesso até <b>${fmtData(p.validade)}</b>${conta.admin ? ' · administrador' : ''}<br>Sessão neste aparelho: ${esc(p.sessao ? p.sessao.aparelho : '')}</div>
-      <div class="linha"><button class="btn peq" id="trocar-senha">Trocar senha</button><button class="btn peq" id="sair">Sair</button></div>`;
+      <div class="dica" style="margin:0 0 10px">${p.plano ? 'Plano <b>' + (p.plano === 'anual' ? 'anual' : 'mensal') + '</b> · ' : ''}Acesso até <b>${fmtData(p.validade)}</b>${diasRestantes(p) !== null && diasRestantes(p) <= 10 ? ` <span style="color:#f04438">(faltam ${diasRestantes(p)} dia(s))</span>` : ''}${conta.admin ? ' · administrador' : ''}<br>Sessão neste aparelho: ${esc(p.sessao ? p.sessao.aparelho : '')}</div>
+      <div class="linha"><button class="btn peq" id="renovar">Renovar</button><button class="btn peq" id="trocar-senha">Trocar senha</button><button class="btn peq" id="sair">Sair</button></div>
+      ${podeEstornar(p) ? `<p class="dica" style="margin:10px 0 0">Garantia de 7 dias até <b>${fmtData(p.garantiaAte)}</b>. <a href="#" id="pedir-estorno" style="color:#f04438;font-weight:600">Cancelar e pedir estorno</a></p>` : ''}`;
   }
+  const diasRestantes = (p) => (p.validade && p.validade.toMillis ? Math.max(0, Math.ceil((p.validade.toMillis() - Date.now()) / 864e5)) : null);
+  const podeEstornar = (p) => !!(p.garantiaAte && p.garantiaAte.toMillis && p.garantiaAte.toMillis() >= Date.now() && !p.estornoPedido);
+  const linkRenovar = (email, plano) => './?' + new URLSearchParams({ plano: plano || 'anual', email: email || '' }).toString() + '#planos';
   document.addEventListener('click', async (e) => {
     if (e.target.closest('#sair')) { await gravarAgora(); Nuvem.sair(); }
+    if (e.target.closest('#renovar')) { location.href = linkRenovar(conta.email, conta.perfil && conta.perfil.plano); }
+    if (e.target.closest('#renovar-login')) { e.preventDefault(); location.href = linkRenovar($('#login-email').value.trim(), 'anual'); }
+    if (e.target.closest('#pedir-estorno')) {
+      e.preventDefault();
+      const ok = await Dialogo.confirmar('Sua assinatura será cancelada agora e você perderá o acesso. O valor pago será devolvido integralmente pela InfinitePay, no mesmo meio de pagamento, em alguns dias úteis.',
+        { titulo: 'Cancelar e pedir estorno', ok: 'Cancelar assinatura', perigo: true });
+      if (!ok) return;
+      try { await gravarAgora(); await Nuvem.pedirEstorno(); await Dialogo.aviso('Pedido de estorno registrado. Você receberá a devolução em alguns dias úteis.', { titulo: 'Assinatura cancelada' }); }
+      catch (err) { Dialogo.aviso(err.message || Nuvem.erroAmigavel(err)); }
+    }
     if (e.target.closest('#trocar-senha')) {
       const v = await Dialogo.form({ titulo: 'Trocar senha', ok: 'Trocar', campos: [
         { nome: 'atual', label: 'Senha atual', tipo: 'password', obrigatorio: true },
@@ -165,14 +179,15 @@
   // ───────── tela de login ─────────
   const MOTIVOS = {
     derrubado: 'Sua conta foi aberta em outro aparelho, por isso esta sessão foi encerrada. Cada conta só pode ser usada em um aparelho por vez.',
-    expirado: 'Seu acesso expirou. Fale com o administrador para renovar.',
-    desativado: 'Seu acesso está desativado. Fale com o administrador.',
+    expirado: 'Seu acesso expirou. Renove para continuar usando: seus clientes e simulações continuam guardados.',
+    desativado: 'Seu acesso está desativado (assinatura cancelada ou bloqueada). Para voltar a usar, renove ou fale com a gente.',
     'sem-acesso': 'Esta conta não tem acesso liberado. Fale com o administrador.',
     erro: 'Não foi possível entrar agora. Verifique a internet e tente de novo.',
   };
   function mostrarLogin(motivo) {
     document.body.classList.add('deslogado');
-    $('#login-msg').innerHTML = motivo && MOTIVOS[motivo] ? `<div class="aviso">${esc(MOTIVOS[motivo])}</div>` : '';
+    $('#login-msg').innerHTML = motivo && MOTIVOS[motivo] ? `<div class="aviso">${esc(MOTIVOS[motivo])}${['expirado', 'sem-acesso', 'desativado'].includes(motivo)
+      ? ' <a href="#" id="renovar-login" style="display:inline;color:var(--pri);font-weight:700">Renovar agora</a>' : ''}</div>` : '';
     $('#login-btn').disabled = false; $('#login-btn').textContent = 'Entrar';
   }
   $('#form-login').addEventListener('submit', async (e) => {
@@ -193,6 +208,26 @@
   // ───────── painel do administrador ─────────
   const emDias = (n) => { const d = new Date(); d.setDate(d.getDate() + n); d.setHours(23, 59, 59, 0); return d; };
   const paraInput = (ts) => { const d = ts && ts.toDate ? ts.toDate() : null; return d ? [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-') : ''; };
+  async function renderEstornos() {
+    const el = $('#estornos-lista');
+    try {
+      const es = await Nuvem.listarEstornos();
+      $('#estornos-card').hidden = !es.length;
+      el.innerHTML = es.map((x) => `<div class="usuario" data-estorno="${x.id}">
+          <div class="post-cab" style="margin:0"><div class="av">↩</div>
+            <div style="min-width:0"><b>${esc(x.nome || x.email)}</b><small>${esc(x.email)} · plano ${esc(x.plano || '')}</small></div>
+            <span class="esp"></span><span class="tag" style="background:rgba(240,68,56,.14);color:#f04438">${x.valor != null ? 'R$ ' + (Number(x.valor) / 100).toFixed(2).replace('.', ',') : ''}</span></div>
+          <p class="dica" style="margin:10px 0 0">Pedido em ${fmtData(x.pedidoEm)} · transação ${esc(x.transaction_nsu || '—')}. Estorne esta venda no app da InfinitePay (Vendas → venda → Estornar) e depois marque como feito.</p>
+          <div class="linha" style="margin-top:10px"><span class="esp"></span><button class="btn peq" data-eacao="feito">Marcar estorno como feito</button></div></div>`).join('');
+    } catch (e) { el.innerHTML = `<div class="erro">${esc(Nuvem.erroAmigavel(e))}</div>`; }
+  }
+  $('#estornos-lista').addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-eacao]'); if (!b) return;
+    const id = b.closest('[data-estorno]').dataset.estorno;
+    if (!(await Dialogo.confirmar('Confirma que já estornou esta venda no app da InfinitePay?', { titulo: 'Estorno feito', ok: 'Sim, já estornei' }))) return;
+    try { await Nuvem.marcarEstornoFeito(id); renderEstornos(); } catch (err) { Dialogo.aviso(Nuvem.erroAmigavel(err)); }
+  });
+
   async function renderPedidos() {
     const el = $('#pedidos-lista');
     try {
@@ -230,7 +265,7 @@
   });
 
   async function renderAdmin() {
-    renderPedidos();
+    renderPedidos(); renderEstornos();
     const el = $('#admin-lista');
     el.innerHTML = '<p class="dica">Carregando…</p>';
     try {
@@ -311,7 +346,7 @@
           document.body.classList.remove('deslogado', 'carregando');
           document.body.classList.toggle('admin', !!c.admin);
           renderConta();
-          if (c.admin) renderPedidos();
+          if (c.admin) { renderPedidos(); renderEstornos(); }
           try { await carregarClientes(); } catch (e) { status('Erro ao carregar clientes: ' + Nuvem.erroAmigavel(e), 'erro'); }
         },
         saiu: (motivo) => {

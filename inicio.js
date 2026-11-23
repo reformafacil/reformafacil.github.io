@@ -65,6 +65,45 @@
   $('#d-valor').addEventListener('input', atualizar);
   atualizar();
 
+  // ───── assinatura (InfinitePay) ─────
+  const PLANOS = { mensal: 'Plano mensal — R$ 29,90', anual: 'Plano anual — R$ 299,00' };
+  const dlg = $('#assinar'), fa = $('#form-assinar');
+  let planoEscolhido = 'anual';
+  const params = new URLSearchParams(location.search);
+  function abrirAssinatura(plano) {
+    planoEscolhido = plano;
+    $('#as-titulo').textContent = PLANOS[plano];
+    $('#as-sub').textContent = plano === 'anual' ? 'Pix ou cartão em até 12x. Primeira assinatura: 7 dias grátis + 365 dias.'
+      : 'Pix ou cartão. Primeira assinatura: 7 dias grátis + 30 dias.';
+    if (params.get('email') && !fa.email.value) fa.email.value = params.get('email');
+    $('#as-erro').hidden = true;
+    dlg.showModal();
+    (fa.nome.value ? fa.email : fa.nome).focus();
+  }
+  document.querySelectorAll('[data-plano]').forEach((b) => b.addEventListener('click', () => abrirAssinatura(b.dataset.plano)));
+  $('#as-cancelar').addEventListener('click', () => dlg.close());
+  fa.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const erro = (t) => { const el = $('#as-erro'); el.textContent = t; el.hidden = false; };
+    const nome = fa.nome.value.trim(), email = fa.email.value.trim();
+    if (!nome) return erro('Informe o seu nome.');
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return erro('Informe um e-mail válido.');
+    if (!window.FUNCOES_URL) return erro('Pagamentos ainda não estão disponíveis.');
+    const b = $('#as-ir'); b.disabled = true; b.textContent = 'Abrindo pagamento…';
+    try {
+      const r = await fetch(window.FUNCOES_URL + '/assinar', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, email, plano: planoEscolhido }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || !j.url) throw new Error(j.erro || 'Não foi possível abrir o pagamento agora.');
+      localStorage.setItem('rtc-assinatura', JSON.stringify({ email, pedido: j.pedido, plano: planoEscolhido }));
+      location.href = j.url;
+    } catch (err) {
+      erro(err.message || 'Não foi possível abrir o pagamento agora.');
+      b.disabled = false; b.textContent = 'Ir para o pagamento';
+    }
+  });
+  if (params.get('plano') && PLANOS[params.get('plano')]) setTimeout(() => abrirAssinatura(params.get('plano')), 300);
+
   // quem já entrou neste aparelho vê "Abrir o app"
   if (Object.keys(localStorage).some((k) => k.startsWith('rtc-sessao-'))) $('#btn-entrar').textContent = 'Abrir o app';
 
@@ -94,11 +133,11 @@
         criadoEm: F.serverTimestamp(),
       });
       form.reset();
-      retorno('Pedido enviado! Vamos responder no seu e-mail em breve.', true);
+      retorno('Mensagem enviada! Vamos responder em breve.', true);
     } catch (err) {
       console.error(err);
       retorno('Não foi possível enviar agora. Verifique a internet e tente de novo.', false);
     }
-    b.disabled = false; b.textContent = 'Quero acesso';
+    b.disabled = false; b.textContent = 'Enviar mensagem';
   });
 })();

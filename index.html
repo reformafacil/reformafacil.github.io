@@ -128,6 +128,24 @@
   footer { padding: 36px 0 50px; color: var(--muted); font-size: 13.5px; text-align: center; }
   footer p { margin: 4px 0; }
 
+
+  /* planos */
+  .planos { display: grid; grid-template-columns: repeat(2, minmax(0, 360px)); gap: 18px; justify-content: center; }
+  .plano { background: var(--card); border-radius: 26px; padding: 26px; box-shadow: var(--sombra); position: relative; display: flex; flex-direction: column; }
+  .plano.destaque { outline: 2px solid var(--pri); }
+  .plano .etq { position: absolute; top: -12px; left: 26px; background: var(--grad); color: #fff; font-size: 12.5px; font-weight: 700; border-radius: 99px; padding: 3px 12px; }
+  .plano h3 { margin: 0; font-size: 18px; }
+  .plano .preco { font-size: 40px; font-weight: 800; letter-spacing: -.03em; margin: 10px 0 0; }
+  .plano .preco small { font-size: 16px; color: var(--muted); font-weight: 600; letter-spacing: 0; }
+  .plano .eq { color: var(--muted); font-size: 14px; margin: 2px 0 14px; min-height: 22px; }
+  .plano ul { list-style: none; padding: 0; margin: 0 0 20px; flex: 1; } .plano li { margin: 7px 0; font-size: 15px; } .plano li::before { content: "✓  "; color: var(--ok); font-weight: 800; }
+  .garantia { max-width: 760px; margin: 22px auto 0; text-align: center; color: var(--muted); font-size: 14.5px; }
+  .garantia b { color: var(--ink); }
+  dialog#assinar { border: 0; padding: 0; border-radius: 24px; width: min(440px, calc(100vw - 32px)); background: var(--card); color: var(--ink); box-shadow: 0 24px 60px rgba(0,0,0,.35); }
+  dialog#assinar::backdrop { background: rgba(10,12,24,.55); backdrop-filter: blur(3px); }
+  dialog#assinar form { padding: 24px; }
+  dialog#assinar h3 { margin: 0 0 4px; font-size: 20px; }
+  @media (max-width: 760px) { .planos { grid-template-columns: 1fr; } }
   @media (max-width: 900px) {
     .hero, .acesso { grid-template-columns: 1fr; }
     .hero { padding-top: 34px; gap: 30px; }
@@ -152,11 +170,12 @@
       <a href="#reforma">A reforma</a>
       <a href="#vantagens">Vantagens</a>
       <a href="#como">Como funciona</a>
+      <a href="#planos">Planos</a>
       <a href="#duvidas">Dúvidas</a>
     </nav>
     <span class="esp"></span>
     <a class="btn sec peq" id="btn-entrar" href="app.html">Entrar</a>
-    <a class="btn pri peq" href="#acesso">Solicitar acesso</a>
+    <a class="btn pri peq" href="#planos">Assinar</a>
   </div>
 </header>
 
@@ -169,7 +188,7 @@
       <p class="lead">Calcule <b>CBS, IBS e Imposto Seletivo</b> em segundos, com as mesmas regras da calculadora oficial da Receita Federal,
         e entenda cada número em linguagem simples.</p>
       <div class="ctas">
-        <a class="btn pri" href="#acesso">Quero acesso</a>
+        <a class="btn pri" href="#planos">Assinar — 7 dias de garantia</a>
         <a class="btn sec" href="#demo">Testar agora, grátis</a>
       </div>
       <div class="provas"><span>Regras oficiais da Receita</span><span>Passo a passo explicado</span><span>Celular e computador</span></div>
@@ -269,6 +288,10 @@
       <div class="faq">
         <details><summary>É a calculadora oficial da Receita Federal?</summary>
           <p>Não. O Reforma Fácil é independente, mas usa as tabelas e as regras de cálculo da calculadora que a Receita publicou como código aberto. O resultado serve para simular e entender, sem valor fiscal: confira antes de emitir documentos.</p></details>
+        <details><summary>Como funciona o pagamento e a renovação?</summary>
+          <p>Você paga o período escolhido (mensal ou anual) por Pix ou cartão, pela InfinitePay. Na primeira assinatura ganha 7 dias a mais. A cobrança não é automática: perto do vencimento, o app mostra um botão para renovar, e o novo período é somado ao que ainda falta.</p></details>
+        <details><summary>Posso cancelar?</summary>
+          <p>Sim. Na primeira assinatura, se cancelar em até 7 dias pelo próprio app (menu Conta), devolvemos 100% do valor pago. Depois disso, é só não renovar: o acesso continua até o fim do período pago.</p></details>
         <details><summary>Preciso instalar alguma coisa?</summary>
           <p>Não. Basta abrir o site no navegador do celular ou do computador e entrar com a sua conta. Se quiser, dá para adicionar à tela de início do celular como um app.</p></details>
         <details><summary>Por que não posso usar a mesma conta em dois aparelhos ao mesmo tempo?</summary>
@@ -283,15 +306,58 @@
     </div>
   </section>
 
+  <!-- PLANOS -->
+  <section id="planos">
+    <div class="wrap">
+      <div class="tit"><div class="pre grad-txt">Planos</div><h2>Simples assim: escolha e comece hoje</h2>
+        <p>Pagamento seguro pela InfinitePay, com Pix ou cartão (até 12x no anual). Acesso liberado assim que o pagamento é confirmado.</p></div>
+      <div class="planos">
+        <div class="plano">
+          <h3>Mensal</h3>
+          <div class="preco">R$ 29,90 <small>/mês</small></div>
+          <div class="eq">Renove quando quiser, sem fidelidade</div>
+          <ul><li>Cálculos e clientes ilimitados</li><li>Comparador antes × depois</li><li>Relatório em PDF com a sua marca</li><li><b>+7 dias grátis</b> na primeira assinatura</li></ul>
+          <button class="btn sec" data-plano="mensal">Assinar o mensal</button>
+        </div>
+        <div class="plano destaque">
+          <span class="etq">2 meses grátis</span>
+          <h3>Anual</h3>
+          <div class="preco">R$ 299 <small>/ano</small></div>
+          <div class="eq">Equivale a R$ 24,92 por mês · economia de R$ 59,80</div>
+          <ul><li>Tudo do plano mensal</li><li>Um ano inteiro sem se preocupar com renovação</li><li>Atualizações da tabela oficial incluídas</li><li><b>+7 dias grátis</b> na primeira assinatura</li></ul>
+          <button class="btn pri" data-plano="anual">Assinar o anual</button>
+        </div>
+      </div>
+      <p class="garantia"><b>Garantia de 7 dias:</b> na primeira assinatura, se não gostar, cancele no próprio app em até 7 dias e devolvemos 100% do valor.
+        Já é cliente? Para renovar, assine com o <b>mesmo e-mail</b>: o novo período é somado ao que você ainda tem.</p>
+    </div>
+  </section>
+
+  <dialog id="assinar">
+    <form id="form-assinar" novalidate>
+      <h3 id="as-titulo">Assinar</h3>
+      <p style="color:var(--muted);margin:0 0 14px;font-size:14.5px" id="as-sub"></p>
+      <div style="display:grid;gap:12px">
+        <div><label for="as-nome">Nome</label><input id="as-nome" name="nome" maxlength="120" autocomplete="name"></div>
+        <div><label for="as-email">E-mail (será o seu login)</label><input id="as-email" name="email" type="email" maxlength="160" autocomplete="email"></div>
+      </div>
+      <div id="as-erro" class="msg erro" hidden style="margin-top:12px"></div>
+      <p style="font-size:12.5px;color:var(--muted);margin:12px 0 0">Você será levado ao pagamento seguro da InfinitePay. Depois de pagar, enviamos um e-mail para você criar a sua senha.</p>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+        <button type="button" class="btn sec peq" id="as-cancelar">Cancelar</button>
+        <button type="submit" class="btn pri" id="as-ir">Ir para o pagamento</button>
+      </div>
+    </form>
+  </dialog>
+
   <!-- ACESSO -->
   <section id="acesso">
     <div class="wrap">
       <div class="acesso">
         <div>
-          <div class="pre grad-txt" style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">Solicitar acesso</div>
-          <h2>Comece a usar o Reforma Fácil</h2>
-          <p style="color:var(--muted);margin:0">Deixe seus dados e entraremos em contato com as opções de plano. Você recebe por e-mail o link para criar a sua senha.</p>
-          <ul><li>Cálculos ilimitados</li><li>Clientes ilimitados salvos na nuvem</li><li>Atualizações da tabela oficial incluídas</li></ul>
+          <div class="pre grad-txt" style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">Fale com a gente</div>
+          <h2>Ficou com alguma dúvida?</h2>
+          <p style="color:var(--muted);margin:0">Quer um plano para a sua equipe, uma demonstração ou tem uma pergunta? Mande uma mensagem e respondemos por e-mail ou WhatsApp.</p>
         </div>
         <form id="form-acesso">
           <div><label for="a-nome">Nome</label><input id="a-nome" name="nome" required maxlength="120" autocomplete="name"></div>
@@ -301,9 +367,9 @@
             <select id="a-perfil" name="perfil"><option>Contador / escritório</option><option>Empresário</option><option>Consultor</option><option>Estudante / professor</option><option>Outro</option></select></div>
           <div><label for="a-msg">Mensagem (opcional)</label><textarea id="a-msg" name="mensagem" rows="3" maxlength="1000"></textarea></div>
           <input name="site" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
-          <button class="btn pri" type="submit">Quero acesso</button>
+          <button class="btn pri" type="submit">Enviar mensagem</button>
           <div id="a-retorno"></div>
-          <p style="font-size:12.5px;color:var(--muted);margin:0">Usamos seus dados só para responder a este pedido.</p>
+          <p style="font-size:12.5px;color:var(--muted);margin:0">Usamos seus dados só para responder a esta mensagem.</p>
         </form>
       </div>
     </div>
@@ -312,7 +378,7 @@
 
 <footer>
   <div class="wrap">
-    <p><b>Reforma Fácil</b> · <a href="app.html">Entrar</a> · <a href="#acesso">Solicitar acesso</a></p>
+    <p><b>Reforma Fácil</b> · <a href="app.html">Entrar</a> · <a href="#planos">Planos</a> · <a href="#acesso">Fale com a gente</a></p>
     <p>Tabelas e regras de cálculo baseadas na calculadora-rtc-regime-regular, © Receita Federal do Brasil, licença MIT.</p>
     <p>Ferramenta independente para simulação e estudo, sem vínculo com a Receita Federal e sem valor fiscal.</p>
   </div>
