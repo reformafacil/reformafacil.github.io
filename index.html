@@ -36,7 +36,7 @@
   header { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     background: color-mix(in srgb, var(--bg) 80%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent); }
   .topo { display: flex; align-items: center; gap: 14px; height: 66px; }
-  .marca { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-weight: 800; font-size: 18px; }
+  .marca { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-weight: 800; font-size: 18px; white-space: nowrap; }
   .ico { width: 38px; height: 38px; border-radius: 12px; background: var(--grad); color: #fff; display: grid; place-items: center; font-weight: 800;
     box-shadow: 0 6px 16px rgba(201,75,255,.35); }
   .menu { display: flex; gap: 22px; margin-left: 26px; }
@@ -139,7 +139,8 @@
     .linha-tempo, .passos { grid-template-columns: 1fr; }
     .res { grid-template-columns: 1fr 1fr; } .res .tot { grid-column: span 2; }
     .g2 { grid-template-columns: 1fr; }
-    .topo .btn.sec { display: none; }
+    .topo .btn.pri { display: none; }
+    .hero h1 { font-size: 34px; }
   }
 </style>
 </head>
