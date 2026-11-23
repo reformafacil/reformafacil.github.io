@@ -144,6 +144,44 @@
   .ano b { display: block; font-size: 20px; font-weight: 800; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
   footer { text-align: center; color: var(--muted); font-size: 12.5px; padding: 0 20px 30px; }
 
+
+  /* ── login ── */
+  #tela-login { display: none; position: fixed; inset: 0; z-index: 50; background: var(--bg); overflow-y: auto;
+    padding: max(40px, env(safe-area-inset-top)) 20px 40px; }
+  body.deslogado #tela-login { display: grid; place-items: center; }
+  body.deslogado .app { visibility: hidden; }
+  .login-box { width: 100%; max-width: 400px; }
+  .login-box .logo-ico { width: 64px; height: 64px; border-radius: 20px; font-size: 26px; margin: 0 auto 14px; }
+  .login-box h1 { text-align: center; margin: 0; font-size: 26px; letter-spacing: -.02em; }
+  .login-box .sub-t { text-align: center; color: var(--muted); margin: 4px 0 22px; }
+  .login-box form { display: grid; gap: 12px; }
+  .login-box .btn { width: 100%; padding: 13px; font-size: 16px; }
+  .login-box a { color: var(--pri); font-weight: 600; font-size: 14px; text-decoration: none; text-align: center; display: block; margin-top: 4px; }
+  body.carregando #tela-login form, body.carregando #tela-login a { display: none; }
+  body.carregando #tela-login .sub-t::after { content: " — carregando…"; }
+
+  /* ── clientes (estilo stories) ── */
+  .barra-clientes { display: flex; gap: 14px; overflow-x: auto; padding: 4px 2px 10px; scrollbar-width: none; }
+  .barra-clientes::-webkit-scrollbar { display: none; }
+  .cli { background: none; border: 0; padding: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px;
+    width: 72px; flex: none; color: var(--ink); font: inherit; }
+  .cli-av { width: 62px; height: 62px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 18px;
+    background: var(--card); color: var(--ink); box-shadow: 0 0 0 2px var(--line); border: 3px solid var(--bg); transition: box-shadow .15s; }
+  .cli.on .cli-av { background: var(--grad); color: #fff; box-shadow: 0 0 0 3px #c94bff; }
+  .cli.novo .cli-av { font-size: 28px; font-weight: 400; color: var(--pri); border-style: dashed; }
+  .cli-nome { font-size: 12px; max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cli.on .cli-nome { font-weight: 700; }
+  .salvo { font-size: 12.5px; color: var(--muted); } .salvo[data-tipo=ok]::before { content: "✓ "; color: var(--ok); }
+  .salvo[data-tipo=erro] { color: var(--err); }
+
+  /* ── conta / admin ── */
+  .conta-card { font-size: 13px; color: var(--muted); }
+  .conta-card:empty { display: none; }
+  .conta-movel { display: none; }
+  body:not(.admin) .so-admin { display: none !important; }
+  .usuario { background: var(--soft); border-radius: 18px; padding: 14px; margin-top: 12px; }
+  .usuario input { background-color: var(--card); }
+  @media (max-width: 860px) { .conta-movel { display: block; } }
   /* ── celular: barra superior + barra de abas inferior ── */
   @media (max-width: 860px) {
     .app { display: block; padding: 0; }
@@ -172,6 +210,23 @@
 </style>
 </head>
 <body>
+<div id="tela-login">
+  <div class="login-box">
+    <div class="logo-ico">%</div>
+    <h1>Reforma Fácil</h1>
+    <p class="sub-t">CBS · IBS · Imposto Seletivo</p>
+    <div class="card">
+      <form id="form-login" autocomplete="on">
+        <div><label for="login-email">E-mail</label><input id="login-email" type="email" autocomplete="username" required></div>
+        <div><label for="login-senha">Senha</label><input id="login-senha" type="password" autocomplete="current-password" required></div>
+        <button class="btn" id="login-btn" type="submit">Entrar</button>
+      </form>
+      <a href="#" id="esqueci">Esqueci minha senha</a>
+      <div id="login-msg"></div>
+    </div>
+    <p class="dica" style="text-align:center">Acesso individual: cada conta funciona em um aparelho por vez.<br>Não tem acesso? Fale com o administrador.</p>
+  </div>
+</div>
 <div class="app">
 <aside class="lateral">
   <div class="logo"><div class="logo-ico">%</div><div><b>Reforma Fácil</b><small>CBS · IBS · Imposto Seletivo</small></div></div>
@@ -179,9 +234,10 @@
     <button data-aba="calc" class="on"><svg viewBox="0 0 24 24"><rect x="4" y="2.5" width="16" height="19" rx="3"/><path d="M8 7h8M8 12h2M14 12h2M8 16h2M14 16h2"/></svg><span>Calcular</span></button>
     <button data-aba="entenda"><svg viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5zM12 6.5v13"/></svg><span>Entenda</span></button>
     <button data-aba="cons"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5 16 16"/></svg><span>Consultar</span></button>
-    <button data-aba="sobre"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5v.5"/></svg><span>Sobre</span></button>
+    <button data-aba="admin" class="so-admin"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M17 7.5h5M19.5 5v5"/></svg><span>Admin</span></button>
+    <button data-aba="sobre"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5v.5"/></svg><span>Conta</span></button>
   </nav>
-  <div class="lateral-card"><b>Baseado na calculadora oficial</b> da Receita Federal (LC 214/2025). Uso educativo, sem valor fiscal.</div>
+  <div class="lateral-card conta-card" id="conta-card"></div>
 </aside>
 
 <main>
@@ -189,6 +245,9 @@
 
   <!-- ───────────── CALCULAR ───────────── -->
   <section id="aba-calc" class="aba on">
+    <div class="titulo-feed" style="margin-top:0">Clientes</div>
+    <div class="barra-clientes" id="barra-clientes"></div>
+    <div class="card" id="cliente-info" style="padding:14px 18px"></div>
     <div class="card">
       <div class="post-cab"><div class="av">R$</div><div><b>Nova simulação</b><small>Escolha a data e as alíquotas; depois adicione os itens</small></div></div>
       <div class="grade">
@@ -288,7 +347,25 @@
   </section>
 
   <!-- ───────────── SOBRE ───────────── -->
+  <section id="aba-admin" class="aba so-admin">
+    <div class="card">
+      <div class="post-cab"><div class="av">+</div><div><b>Nova conta</b><small>A pessoa recebe um e-mail para criar a própria senha</small></div></div>
+      <form id="form-novo-usuario" class="grade">
+        <div><label>Nome</label><input name="nome" required maxlength="120"></div>
+        <div><label>E-mail</label><input name="email" type="email" required></div>
+        <div><label>Acesso por</label><select name="dias"><option value="7">7 dias (teste)</option><option value="30" selected>30 dias</option><option value="90">90 dias</option><option value="365">1 ano</option></select></div>
+        <div style="align-self:end"><button class="btn" type="submit" style="width:100%">Criar conta</button></div>
+      </form>
+      <div id="admin-msg"></div>
+    </div>
+    <div class="card">
+      <div class="linha"><h2 style="margin:0">Contas</h2><span class="esp"></span><span class="dica" id="admin-conta" style="margin:0"></span></div>
+      <div id="admin-lista"></div>
+    </div>
+  </section>
+
   <section id="aba-sobre" class="aba prosa">
+    <div class="card conta-movel"><div class="conta-card"></div></div>
     <div class="card">
       <h2>Sobre esta ferramenta</h2>
       <p>Programa feito a partir do código-fonte da <b>calculadora-rtc-regime-regular</b> publicada pela Receita Federal/Serpro.
@@ -317,7 +394,10 @@
 
 <script src="dados.js"></script>
 <script src="motor.js"></script>
+<script src="firebase-config.js"></script>
 <script src="app.js"></script>
+<script src="conta.js"></script>
+<script type="module" src="nuvem.js"></script>
 <script>
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
     window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));

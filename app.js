@@ -32,11 +32,13 @@
     regCst: '000', regCls: '000001', temIS: false,
     is: { cClassTrib: '000001', baseCalculo: '', quantidade: '1', adValorem: '', adRem: '', isInformado: '' },
   }, o || {});
-  let est = carregar() || { data: hoje, uf: '', simular: false, aliq: Object.assign({}, SUGESTAO_2027), itens: [novoItem({ descricao: 'Item 1', baseCalculo: '1000' })] };
-  seq = Math.max(1, ...est.itens.map((i) => i.id + 1));
+  function novaOperacao() {
+    return { data: hoje, uf: '', simular: false, aliq: Object.assign({}, SUGESTAO_2027), itens: [novoItem({ descricao: 'Item 1', baseCalculo: '' })] };
+  }
+  let est = novaOperacao();
 
-  function salvar() { try { localStorage.setItem('rtc-calc', JSON.stringify(est)); } catch (e) { /* sem armazenamento */ } }
-  function carregar() { try { return JSON.parse(localStorage.getItem('rtc-calc')); } catch (e) { return null; } }
+  // cada cliente (aba) tem a sua operação; quem guarda é conta.js (nuvem ou armazenamento local)
+  function salvar() { if (window.App && typeof window.App.aoMudar === 'function') window.App.aoMudar(est); }
   const ano = () => parseInt((est.data || hoje).slice(0, 4), 10);
   const dataOk = () => (est.data && est.data >= '2026-01-01' ? est.data : '2026-01-01');
 
@@ -461,5 +463,24 @@
   $('#sobre-versao').innerHTML = `Versão da base de dados oficial: <b>${esc(D.versao.v)}</b> (${esc(D.versao.d.slice(0, 10).split('-').reverse().join('/'))}) — ${esc(D.versao.descr)}`;
 
   function renderTudo() { renderAliq(); renderItens(); calcular(); }
+
+  window.App = {
+    novaOperacao,
+    aoMudar: null,
+    // abre a operação de um cliente (sem disparar salvamento)
+    abrir(op) {
+      const salvarAntes = window.App.aoMudar; window.App.aoMudar = null;
+      est = op && op.itens ? JSON.parse(JSON.stringify(op)) : novaOperacao();
+      if (!est.aliq) est.aliq = Object.assign({}, SUGESTAO_2027);
+      est.itens.forEach((i) => { if (!i.is) i.is = novoItem().is; });
+      seq = Math.max(1, ...est.itens.map((i) => (i.id || 0) + 1));
+      $('#data').value = est.data || hoje; ufSel.value = est.uf || '';
+      cData.value = dataOk();
+      renderTudo();
+      window.App.aoMudar = salvarAntes;
+    },
+    operacaoAtual: () => est,
+  };
   renderTudo();
+  window.dispatchEvent(new Event('app-pronto'));
 })();

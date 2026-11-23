@@ -2,6 +2,12 @@
 
 Para usar: dê **dois cliques em `index.html`**. O programa abre no navegador e funciona sem internet.
 
+## Login e contas
+O app exige login (Firebase). Cada pessoa tem uma conta individual, criada por você na aba **Admin**,
+com validade de acesso. Cada conta só funciona em um aparelho por vez: entrar em outro derruba o anterior.
+Dentro do app, cada usuário cria abas de **clientes**, e cada uma guarda a sua própria simulação na nuvem.
+Configuração e funcionamento: [CONFIGURAR-FIREBASE.md](CONFIGURAR-FIREBASE.md). Projeto Firebase: `reforma-facil-60df7`.
+
 ## Abas
 - **Calcular**: escolha a data, o CST e a cClassTrib de cada item, digite a base de cálculo e veja CBS, IBS e IS,
   com explicação em linguagem simples e o passo a passo com as fórmulas oficiais.

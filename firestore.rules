@@ -1,0 +1,50 @@
+rules_version = '2';
+
+// Regras de segurança do Reforma Fácil (cole no Firebase Console → Firestore → Regras).
+//
+// Estrutura:
+//   admins/{uid}                         existe = é administrador (criado à mão no Console)
+//   usuarios/{uid}                       { nome, email, ativo, validade, sessao: { id, aparelho, em } }
+//   usuarios/{uid}/clientes/{clienteId}  { nome, documento, operacao, sessao, atualizadoEm }
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function logado() { return request.auth != null; }
+    function eu(uid) { return logado() && request.auth.uid == uid; }
+    function admin() { return logado() && exists(/databases/$(db)/documents/admins/$(request.auth.uid)); }
+    function perfil(uid) { return get(/databases/$(db)/documents/usuarios/$(uid)).data; }
+    // acesso liberado pelo administrador e dentro da validade
+    function acessoValido(uid) {
+      let p = perfil(uid);
+      return p.ativo == true && p.validade > request.time;
+    }
+
+    match /admins/{uid} {
+      allow read: if eu(uid);
+      allow write: if false;            // só pelo Console
+    }
+
+    match /usuarios/{uid} {
+      allow read: if admin() || eu(uid);
+      allow create, delete: if admin();
+      // o administrador edita tudo; o próprio usuário só troca a sessão ativa (login derruba o aparelho anterior)
+      allow update: if admin()
+        || (eu(uid)
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['sessao'])
+            && request.resource.data.sessao.id is string
+            && request.resource.data.sessao.id.size() >= 16);
+
+      match /clientes/{clienteId} {
+        allow read, delete: if eu(uid) && acessoValido(uid);
+        // gravações só valem vindas da sessão ativa: um aparelho derrubado não consegue mais salvar
+        allow create, update: if eu(uid) && acessoValido(uid)
+          && request.resource.data.sessao == perfil(uid).sessao.id
+          && request.resource.data.nome is string
+          && request.resource.data.nome.size() > 0
+          && request.resource.data.nome.size() <= 120;
+      }
+    }
+
+    // todo o resto é negado
+  }
+}
