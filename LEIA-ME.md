@@ -19,6 +19,8 @@ Configuração e funcionamento: [CONFIGURAR-FIREBASE.md](CONFIGURAR-FIREBASE.md)
 
 ## Arquivos
 - `index.html` + `inicio.js`: página inicial
+- `comparador-modelo.js` + `comparador.js`: aba Comparar (antes × depois da reforma, 2026–2033)
+- `dialogo.js`: janelas do app (no lugar de prompt/confirm, que alguns navegadores bloqueiam)
 - `app.html`, `app.js`, `conta.js`, `nuvem.js`: a calculadora, o login e o painel do administrador
 - `motor.js`: motor de cálculo (mesmas fórmulas e arredondamentos da calculadora da Receita)
 - `dados.js`: tabelas extraídas do banco oficial (versão V0073)
@@ -27,7 +29,7 @@ Configuração e funcionamento: [CONFIGURAR-FIREBASE.md](CONFIGURAR-FIREBASE.md)
 ## Atualizar os dados quando a Receita publicar uma nova versão
 1. Gere o banco do projeto oficial (`calculadora-pro.db`), como explica o README da Receita.
 2. `python3 ferramentas/extrair.py caminho/calculadora-pro.db dados.js`
-3. Teste: `jsc -e "var window=this;" dados.js motor.js ferramentas/testes.js`
+3. Teste: `jsc -e "var window=this;" dados.js motor.js ferramentas/testes.js` e `jsc comparador-modelo.js ferramentas/testes-comparador.js`
    (`jsc` fica em /System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/Helpers/)
 
 Uso educativo, sem valor fiscal. Confirme os valores antes de emitir documentos.

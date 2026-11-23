@@ -227,8 +227,8 @@
   }
 
   $('#add-item').addEventListener('click', () => { est.itens.push(novoItem({ descricao: 'Item ' + (est.itens.length + 1) })); renderTudo(); });
-  $('#limpar').addEventListener('click', () => {
-    if (!confirm('Apagar todos os itens?')) return;
+  $('#limpar').addEventListener('click', async () => {
+    if (!(await Dialogo.confirmar('Apagar todos os itens desta simulação?', { titulo: 'Limpar tudo', ok: 'Apagar', perigo: true }))) return;
     est.itens = [novoItem({ descricao: 'Item 1' })]; renderTudo();
   });
   $('#exemplo').addEventListener('click', () => {
@@ -419,8 +419,10 @@
     };
     const txt = JSON.stringify(ent, null, 2);
     const fim = () => { btn.textContent = 'Copiado! (troque NCM/NBS e município)'; setTimeout(() => { btn.textContent = 'Copiar JSON da API'; }, 3500); };
-    if (navigator.clipboard) navigator.clipboard.writeText(txt).then(fim, () => prompt('Copie o JSON:', txt));
-    else prompt('Copie o JSON:', txt);
+    const manual = () => Dialogo.form({ titulo: 'Copie o JSON', texto: 'Selecione o texto abaixo e copie.', ok: 'Fechar',
+      campos: [{ nome: 'json', label: 'JSON para a API oficial', valor: txt }] });
+    if (navigator.clipboard) navigator.clipboard.writeText(txt).then(fim, manual);
+    else manual();
   }
 
   // ───────── consulta ─────────
@@ -478,8 +480,10 @@
       cData.value = dataOk();
       renderTudo();
       window.App.aoMudar = salvarAntes;
+      window.dispatchEvent(new Event('operacao-aberta'));
     },
     operacaoAtual: () => est,
+    notificar: () => salvar(),
   };
   renderTudo();
   window.dispatchEvent(new Event('app-pronto'));

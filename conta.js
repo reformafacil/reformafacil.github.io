@@ -78,15 +78,16 @@
     window.App.abrir(c && c.operacao);
   }
   async function novoCliente() {
-    const nome = prompt('Nome do cliente (pessoa ou empresa):');
-    if (!nome || !nome.trim()) return;
-    const documento = prompt('CPF/CNPJ (opcional):') || '';
+    const v = await Dialogo.form({ titulo: 'Novo cliente', ok: 'Criar', campos: [
+      { nome: 'nome', label: 'Nome (pessoa ou empresa)', obrigatorio: true, max: 120 },
+      { nome: 'documento', label: 'CPF/CNPJ (opcional)', max: 30 }] });
+    if (!v) return;
     const operacao = window.App.novaOperacao();
     try {
-      const id = await store.criarCliente(nome.trim().slice(0, 120), documento.trim(), operacao);
-      clientes.push({ id, nome: nome.trim().slice(0, 120), documento: documento.trim(), operacao });
+      const id = await store.criarCliente(v.nome.slice(0, 120), v.documento, operacao);
+      clientes.push({ id, nome: v.nome.slice(0, 120), documento: v.documento, operacao });
       await abrirCliente(id);
-    } catch (e) { alert('Não foi possível criar: ' + (window.Nuvem ? Nuvem.erroAmigavel(e) : e.message)); }
+    } catch (e) { Dialogo.aviso('Não foi possível criar: ' + (window.Nuvem ? Nuvem.erroAmigavel(e) : e.message)); }
   }
   document.addEventListener('click', async (e) => {
     const b = e.target.closest('[data-cli]');
@@ -94,20 +95,22 @@
     if (e.target.closest('#novo-cliente')) return novoCliente();
     if (e.target.closest('#ren-cliente')) {
       const c = clientes.find((x) => x.id === ativo);
-      const nome = prompt('Nome do cliente:', c.nome); if (!nome || !nome.trim()) return;
-      const doc = prompt('CPF/CNPJ (opcional):', c.documento || '');
-      c.nome = nome.trim().slice(0, 120); if (doc !== null) c.documento = doc.trim();
+      const v = await Dialogo.form({ titulo: 'Editar cliente', campos: [
+        { nome: 'nome', label: 'Nome (pessoa ou empresa)', valor: c.nome, obrigatorio: true, max: 120 },
+        { nome: 'documento', label: 'CPF/CNPJ (opcional)', valor: c.documento || '', max: 30 }] });
+      if (!v) return;
+      c.nome = v.nome.slice(0, 120); c.documento = v.documento;
       pendente = true; await gravarAgora(); renderAbas();
     }
     if (e.target.closest('#del-cliente')) {
       const c = clientes.find((x) => x.id === ativo);
-      if (!confirm(`Excluir o cliente "${c.nome}" e a simulação dele? Isso não pode ser desfeito.`)) return;
+      if (!(await Dialogo.confirmar(`Excluir o cliente "${c.nome}" e a simulação dele? Isso não pode ser desfeito.`, { titulo: 'Excluir cliente', ok: 'Excluir', perigo: true }))) return;
       try {
         await store.excluirCliente(c.id); pendente = false;
         clientes = clientes.filter((x) => x.id !== c.id);
         if (!clientes.length) await criarPrimeiro();
         await abrirCliente(clientes[0].id);
-      } catch (err) { alert('Não foi possível excluir: ' + (window.Nuvem ? Nuvem.erroAmigavel(err) : err.message)); }
+      } catch (err) { Dialogo.aviso('Não foi possível excluir: ' + (window.Nuvem ? Nuvem.erroAmigavel(err) : err.message)); }
     }
   });
   async function criarPrimeiro() {
@@ -146,11 +149,12 @@
   document.addEventListener('click', async (e) => {
     if (e.target.closest('#sair')) { await gravarAgora(); Nuvem.sair(); }
     if (e.target.closest('#trocar-senha')) {
-      const atual = prompt('Senha atual:'); if (!atual) return;
-      const nova = prompt('Nova senha (mínimo 8 caracteres):'); if (!nova) return;
-      if (nova.length < 8) return alert('A senha precisa ter pelo menos 8 caracteres.');
-      try { await Nuvem.trocarSenha(atual, nova); alert('Senha alterada.'); }
-      catch (err) { alert(Nuvem.erroAmigavel(err)); }
+      const v = await Dialogo.form({ titulo: 'Trocar senha', ok: 'Trocar', campos: [
+        { nome: 'atual', label: 'Senha atual', tipo: 'password', obrigatorio: true },
+        { nome: 'nova', label: 'Nova senha', tipo: 'password', obrigatorio: true, min: 8 }] });
+      if (!v) return;
+      try { await Nuvem.trocarSenha(v.atual, v.nova); Dialogo.aviso('Senha alterada.', { titulo: 'Pronto' }); }
+      catch (err) { Dialogo.aviso(Nuvem.erroAmigavel(err)); }
     }
   });
 
@@ -216,8 +220,8 @@
       $('#admin-msg').innerHTML = '<div class="info">Dados do pedido preenchidos. Escolha o período e clique em "Criar conta"; depois remova o pedido.</div>';
     }
     if (b.dataset.pacao === 'remover') {
-      if (!confirm('Remover o pedido de ' + p.nome + '?')) return;
-      try { await Nuvem.excluirSolicitacao(id); renderPedidos(); } catch (err) { alert(Nuvem.erroAmigavel(err)); }
+      if (!(await Dialogo.confirmar('Remover o pedido de ' + p.nome + '?', { titulo: 'Remover pedido', ok: 'Remover', perigo: true }))) return;
+      try { await Nuvem.excluirSolicitacao(id); renderPedidos(); } catch (err) { Dialogo.aviso(Nuvem.erroAmigavel(err)); }
     }
   });
 
@@ -253,7 +257,7 @@
   $('#admin-lista').addEventListener('change', async (e) => {
     const card = e.target.closest('[data-uid]'); if (!card || e.target.dataset.campo !== 'validade' || !e.target.value) return;
     try { await Nuvem.atualizarUsuario(card.dataset.uid, { validade: new Date(e.target.value + 'T23:59:59') }); renderAdmin(); }
-    catch (err) { alert(Nuvem.erroAmigavel(err)); }
+    catch (err) { Dialogo.aviso(Nuvem.erroAmigavel(err)); }
   });
   $('#admin-lista').addEventListener('click', async (e) => {
     const b = e.target.closest('[data-acao]'); if (!b) return;
@@ -265,10 +269,10 @@
       if (b.dataset.acao === 'mais30') await Nuvem.atualizarUsuario(uid, { validade: somar(30), ativo: true });
       if (b.dataset.acao === 'mais365') await Nuvem.atualizarUsuario(uid, { validade: somar(365), ativo: true });
       if (b.dataset.acao === 'ativo') await Nuvem.atualizarUsuario(uid, { ativo: !u.ativo });
-      if (b.dataset.acao === 'derrubar') { if (!confirm('Encerrar a sessão de ' + u.email + '? A pessoa terá que entrar de novo.')) return; await Nuvem.derrubarSessao(uid); }
-      if (b.dataset.acao === 'senha') { await Nuvem.reenviarSenha(u.email); alert('E-mail enviado para ' + u.email); }
+      if (b.dataset.acao === 'derrubar') { if (!(await Dialogo.confirmar('Encerrar a sessão de ' + u.email + '? A pessoa terá que entrar de novo.', { titulo: 'Encerrar sessão', ok: 'Encerrar', perigo: true }))) return; await Nuvem.derrubarSessao(uid); }
+      if (b.dataset.acao === 'senha') { await Nuvem.reenviarSenha(u.email); Dialogo.aviso('E-mail enviado para ' + u.email, { titulo: 'Pronto' }); }
       renderAdmin();
-    } catch (err) { alert(Nuvem.erroAmigavel(err)); }
+    } catch (err) { Dialogo.aviso(Nuvem.erroAmigavel(err)); }
   });
   $('#form-novo-usuario').addEventListener('submit', async (e) => {
     e.preventDefault();
